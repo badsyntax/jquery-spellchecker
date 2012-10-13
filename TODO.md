@@ -1,0 +1,1 @@
+* Ability to check the spelling on a string on text via public API method

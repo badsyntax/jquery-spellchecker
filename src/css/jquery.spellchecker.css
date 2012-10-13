@@ -1,0 +1,32 @@
+.spellchecker-suggestbox {
+	position: absolute;
+	display: none;
+	z-index: 9999;
+	overflow: none;
+	font: normal 13px arial;
+	box-shadow: 0 0 4px #aaa;
+	background: #fff;
+	border: 1px solid #bbb;
+}
+.spellchecker-suggestbox .loading {
+	padding: 3px 6px;
+	font-style: italic;
+}
+.spellchecker-suggestbox a {
+	outline: none;
+	color: #333;
+	padding: 3px 6px;
+	display: block;
+	text-decoration: none;
+}
+.spellchecker-suggestbox a:hover {
+	color: #000;
+	background: #ddd;
+}
+.spellchecker-suggestbox-footer {
+	border-top: 1px solid #ddd;
+}
+.spellchecker-suggestbox-footer .ignore-all,
+.spellchecker-suggestbox-footer .ignore-forever {
+	display: none;
+}
