@@ -1,9 +1,8 @@
 <?php
 /**
- * Spellchecker class
- * https://github.com/badsyntax/jquery-spellchecker
+ * Spellchecker PSpell driver class
  *
- * @package    jQuery Spellchecker
+ * @package    jQuery Spellchecker (https://github.com/badsyntax/jquery-spellchecker)
  * @category   Core
  * @author     Richard Willis
  * @copyright  (c) Richard Willis
@@ -15,7 +14,7 @@ class SpellChecker_Driver_PSpell extends Spellchecker_Driver
 
   protected $_default_config = array(
     'dictionary' => 'pspell/dictionary',
-    'language' => 'en'
+    'lang' => 'en'
   );
 
   public function __construct()

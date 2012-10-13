@@ -1,9 +1,8 @@
 <?php
 /**
  * Spellchecker class
- * https://github.com/badsyntax/jquery-spellchecker
  *
- * @package    jQuery Spellchecker
+ * @package    jQuery Spellchecker (https://github.com/badsyntax/jquery-spellchecker)
  * @category   Core
  * @author     Richard Willis
  * @copyright  (c) Richard Willis
@@ -16,16 +15,13 @@ class SpellChecker {
 
 	public function __construct()
 	{
-		if (!isset($_SERVER['PATH_INFO']))
+		if (!$_POST)
 		{
-			exit('No path info');
+			exit;
 		}
 
-		$segments = explode('/', $_SERVER['PATH_INFO']);
-		$segments = array_merge($segments, array(0,1));
-		$segments = array_slice($segments, 1, 2);
-
-		list($driver, $action) = $segments;
+		$driver = $_POST['driver'];
+		$action = $_POST['action'];
 
 		if (!$driver)
 		{

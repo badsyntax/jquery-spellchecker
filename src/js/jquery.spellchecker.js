@@ -266,6 +266,7 @@
     this.config = config;
 
     this.defaultConfig = {
+      url: this.config.engine.path,
       type: 'POST',
       dataType: 'json',
       cache: false,
@@ -287,16 +288,9 @@
   };
 
   Driver.prototype.checkWords = function(text, callback) {
-
-    var url = [
-      this.config.engine.path,
-      this.config.engine.driver.type,
-      'get_incorrect_words'
-    ].join('/');
-
     return this.makeRequest({
-      url: url,
       data: {
+        action: 'get_incorrect_words',
         text: text
       },
       success: callback
@@ -304,16 +298,9 @@
   };
 
   Driver.prototype.getSuggestedWords = function(word, callback) {
-
-    var url = [
-      this.config.engine.path,
-      this.config.engine.driver.type,
-      'get_suggestions'
-    ].join('/');
-
     return this.makeRequest({
-      url: url,
       data: {
+        action: 'get_suggestions',
         word: word
       },
       success: callback
@@ -325,10 +312,15 @@
 
   var Drivers = {};
 
-  Drivers.PSpell = function(path, lang) {
+  Drivers.Pspell = function() {
     Driver.apply(this, arguments);
   };
-  inherits(Drivers.PSpell, Driver);
+  inherits(Drivers.Pspell, Driver);
+
+  Drivers.Google = function() {
+    Driver.apply(this, arguments);
+  }
+  inherits(Drivers.Google, Driver);
 
 
   /* Spellchecker
@@ -349,7 +341,15 @@
   inherits(SpellChecker, Events);
 
   SpellChecker.prototype.setupDriver = function() {
-    this.driver = new Drivers[this.config.engine.driver.type](this.config);
+
+    var driver = this.config.engine.driver.type;
+
+    driver = driver.toLowerCase();
+    driver = driver.charAt(0).toUpperCase() + driver.slice(1);
+
+    console.log(window);
+
+    this.driver = new Drivers[driver](this.config);
   };
 
   SpellChecker.prototype.setupSuggestBox = function() {

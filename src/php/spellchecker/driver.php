@@ -1,9 +1,8 @@
 <?php
 /**
- * Spellchecker class
- * https://github.com/badsyntax/jquery-spellchecker
+ * Spellchecker driver class
  *
- * @package    jQuery Spellchecker
+ * @package    jQuery Spellchecker (https://github.com/badsyntax/jquery-spellchecker)
  * @category   Core
  * @author     Richard Willis
  * @copyright  (c) Richard Willis
