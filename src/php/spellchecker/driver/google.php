@@ -38,20 +38,15 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
   {
     $text = $_POST['text'];
 
-    $incorrect_words = array();
-
     $text = urldecode($text);
 
     $words = $this->get_matches($text);
 
+    $incorrect_words = array();
+
     foreach($words as $word)
     {
-       $word = substr($text, $word[1], $word[2]);
-       
-       if (!in_array($word, $incorrect_words))
-       {
-         $incorrect_words[] = $word;
-       }
+      $incorrect_words[] = substr($text, $word[1], $word[2]);
     }
 
     $this->send_data('success', $incorrect_words);

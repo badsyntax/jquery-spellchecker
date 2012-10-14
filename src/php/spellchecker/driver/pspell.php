@@ -48,9 +48,7 @@ class SpellChecker_Driver_PSpell extends Spellchecker_Driver
     
     foreach($words as $word)
     {
-      $spelt_correctly = pspell_check($this->pspell_link, $word);
-
-      if (!$spelt_correctly and !in_array($word, $incorrect_words))
+      if (!pspell_check($this->pspell_link, $word))
       {
         $incorrect_words[] = $word;
       }
