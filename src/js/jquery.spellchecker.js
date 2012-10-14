@@ -390,7 +390,7 @@
     this.element.val(newText);
   };
 
-  /* Spellchecker text parser
+  /* Spellchecker html parser
    *************************/
 
   var HtmlParser = function() {
@@ -402,38 +402,66 @@
     return this.element.text();
   };
 
-  HtmlParser.prototype.replaceWord = function(oldWord, replaceMent) {
+  HtmlParser.prototype.replace = function(regExp, replaceText) {
+    findAndReplaceDOMText(regExp, this.element[0], replaceText);
+  };
+
+  HtmlParser.prototype.replaceWord = function(oldWord, replacement) {
 
     findAndReplaceDOMText.revert();
 
-    var span = $('<span />', {
-      'class': pluginName + '-word-highlight',
-      'data-word': oldWord
-    })[0];
+    var r = replacement;
+    var replaced;
+    var replaceFill;
+    var c;
 
-    findAndReplaceDOMText(new RegExp(oldWord), this.element[0], span);
+    this.replace(new RegExp(oldWord, 'g'), function(fill, i){
+
+      // Reset the replacement for each match
+      if (i !== c) {
+        c = i;
+        replacement = r;
+        replaced = '';
+      }
+
+      replaceFill = replacement.substring(0, fill.length);
+      replacement = replacement.substring(fill.length);
+      replaced += fill;
+
+      // Add remaining text to last node
+      if (replaced === oldWord && replacement.length > 0) {
+        replaceFill += replacement;
+      }
+
+      return document.createTextNode(replaceFill || '');
+    });
+
+    // Remove this word from the list of incorrect words
+    this.incorrectWords = $.map(this.incorrectWords, function(word) {
+      return word === oldWord ? null : word;
+    });
+
+    this.highlightWords(this.incorrectWords);
   };
 
-  HtmlParser.prototype.highlightWords = function(words) {
+  HtmlParser.prototype.highlightWords = function(incorrectWords) {
 
-    if (this.hasReplacedText) {
-      findAndReplaceDOMText.revert();
+    if (!incorrectWords.length) {
+      return;
     }
+
+    this.incorrectWords = incorrectWords;
     
-    $.each(words, function(i, word){
-    
-      var span = $('<span />', {
+    var exp = incorrectWords.join('|');
+    var regExp = new RegExp(exp, 'g') 
+
+    this.replace(regExp, function(fill, i) {
+      return $('<span />', {
         'class': pluginName + '-word-highlight',
-        'data-word': word
-      })[0];
-
-      findAndReplaceDOMText(new RegExp(word), this.element[0], span);
-      
-      this.hasReplacedText = true;
-
-    }.bind(this));
+        'data-word': incorrectWords[i]
+      }).text(fill)[0];
+    });
   };
-
 
   /* Spellchecker
    *************************/
@@ -543,7 +571,7 @@
     e.preventDefault();
     this.parser.replaceWord(this.badWord, word);
     this.suggestBox.close();
-    this.badWordElement.remove();
+    // this.badWordElement.remove();
   };
 
   SpellChecker.prototype.onIgnoreWord = function() {
@@ -569,7 +597,7 @@
 
 }(jQuery));
 /**
- * findAndReplaceDOMText v 0.1
+ * findAndReplaceDOMText v 0.11
  * @author James Padolsey http://james.padolsey.com
  * @license http://unlicense.org/UNLICENSE
  *
@@ -577,259 +605,5 @@
  * and replaces each match (or node-separated portions of the match)
  * in the specified element.
  *
- * Example: Wrap 'test' in <em>:
- *   <p id="target">This is a test</p>
- *   <script>
- *     findAndReplaceDOMText(
- *       /test/,
- *       document.getElementById('target'),
- *       'em'
- *     );
- *   </script>
  */
-window.findAndReplaceDOMText = (function() {
-
-  /** 
-   * findAndReplaceDOMText
-   * 
-   * Locates matches and replaces with replacementNode
-   *
-   * @param {RegExp} regex The regular expression to match
-   * @param {Node} node Element or Text node to search within
-   * @param {String|Element|Function} replacementNode A NodeName,
-   *  Node to clone, or a function which returns a node to use
-   *  as the replacement node.
-   */
-  function findAndReplaceDOMText(regex, node, replacementNode) {
-
-    var m, index, matches = [], text = _getText(node);
-    var replaceFn = _genReplacer(replacementNode);
-
-    if (!text) { return; }
-
-    if (regex.global) {
-      while (m = regex.exec(text)) {
-        if (!m[0]) throw 'findAndReplaceDOMText cannot handle zero-length matches';
-        matches.push([regex.lastIndex - m[0].length, regex.lastIndex, m]);
-      }
-    } else {
-      m = text.match(regex);
-      index = text.indexOf(m[0]);
-      if (!m[0]) throw 'findAndReplaceDOMText cannot handle zero-length matches';
-      matches.push([index, index + m[0].length, m]);
-    }
-
-    if (matches.length) {
-      _stepThroughMatches(node, matches, replaceFn);
-    }
-
-  }
-
-  /**
-   * Gets aggregate text of a node without resorting
-   * to broken innerText/textContent
-   */
-  function _getText(node) {
-
-    if (node.nodeType === 3) {
-      return node.data;
-    }
-
-    var txt = '';
-
-    if (node = node.firstChild) do {
-      txt += _getText(node);
-    } while (node = node.nextSibling);
-
-    return txt;
-
-  }
-
-  /** 
-   * Steps through the target node, looking for matches, and
-   * calling replaceFn when a match is found.
-   */
-  function _stepThroughMatches(node, matches, replaceFn) {
-
-    var after, before,
-        startNode,
-        endNode,
-        startNodeIndex,
-        endNodeIndex,
-        innerNodes = [],
-        atIndex = 0,
-        curNode = node,
-        matchLocation = matches.shift(),
-        matchIndex = 0;
-
-    out: while (true) {
-
-      if (curNode.nodeType === 3) {
-        if (!endNode && curNode.length + atIndex >= matchLocation[1]) {
-          // We've found the ending
-          endNode = curNode;
-          endNodeIndex = matchLocation[1] - atIndex;
-        } else if (startNode) {
-          // Intersecting node
-          innerNodes.push(curNode);
-        }
-        if (!startNode && curNode.length + atIndex > matchLocation[0]) {
-          // We've found the match start
-          startNode = curNode;
-          startNodeIndex = matchLocation[0] - atIndex;
-        }
-        atIndex += curNode.length;
-      }
-
-      if (startNode && endNode) {
-        curNode = replaceFn({
-          startNode: startNode,
-          startNodeIndex: startNodeIndex,
-          endNode: endNode,
-          endNodeIndex: endNodeIndex,
-          innerNodes: innerNodes,
-          match: matchLocation[2],
-          matchIndex: matchIndex
-        });
-        // replaceFn has to return the node that replaced the endNode
-        // and then we step back so we can continue from the end of the 
-        // match:
-        atIndex -= (endNode.length - endNodeIndex);
-        startNode = null;
-        endNode = null;
-        innerNodes = [];
-        matchLocation = matches.shift();
-        matchIndex++;
-        if (!matchLocation) {
-          break; // no more matches
-        }
-      } else if (curNode.firstChild || curNode.nextSibling) {
-        // Move down or forward:
-        curNode = curNode.firstChild || curNode.nextSibling;
-        continue;
-      }
-
-      // Move forward or up:
-      while (true) {
-        if (curNode.nextSibling) {
-          curNode = curNode.nextSibling;
-          break;
-        } else if (curNode.parentNode !== node) {
-          curNode = curNode.parentNode;
-        } else {
-          break out;
-        }
-      }
-
-    }
-
-  }
-
-  var reverts;
-  /**
-   * Reverts the last findAndReplaceDOMText process
-   */
-  findAndReplaceDOMText.revert = function revert() {
-    for (var i = 0, l = reverts.length; i < l; ++i) {
-      reverts[i]();
-    }
-    reverts = [];
-  };
-
-  /** 
-   * Generates the actual replaceFn which splits up text nodes
-   * and inserts the replacement element.
-   */
-  function _genReplacer(nodeName) {
-
-    reverts = [];
-
-    var makeReplacementNode;
-
-    if (typeof nodeName != 'function') {
-      var stencilNode = nodeName.nodeType ? nodeName : document.createElement(nodeName);
-      makeReplacementNode = function(fill) {
-        var clone = document.createElement('div'),
-            el;
-        clone.innerHTML = stencilNode.outerHTML || new XMLSerializer().serializeToString(stencilNode);
-        el = clone.firstChild;
-        if (fill) {
-          el.appendChild(document.createTextNode(fill));
-        }
-        return el;
-      };
-    } else {
-      makeReplacementNode = nodeName;
-    }
-
-    return function replace(range) {
-
-      var startNode = range.startNode,
-          endNode = range.endNode,
-          matchIndex = range.matchIndex;
-
-      if (startNode === endNode) {
-        var node = startNode;
-        if (range.startNodeIndex > 0) {
-          // Add `before` text node (before the match)
-          var before = document.createTextNode(node.data.substring(0, range.startNodeIndex));
-          node.parentNode.insertBefore(before, node);
-        }
-        // Create the replacement node:
-       // var el = stencilNode.cloneNode(false);
-        //el.appendChild(document.createTextNode(range.match[0]));
-        var el = makeReplacementNode(range.match[0], matchIndex);
-        node.parentNode.insertBefore(el, node);
-        if (range.endNodeIndex < node.length) {
-          // Add `after` text node (after the match)
-          var after = document.createTextNode(node.data.substring(range.endNodeIndex));
-          node.parentNode.insertBefore(after, node);
-        }
-        node.parentNode.removeChild(node);
-        reverts.push(function() {
-          var pnode = el.parentNode;
-          pnode.insertBefore(el.firstChild, el);
-          pnode.removeChild(el);
-          pnode.normalize();
-        });
-        return el;
-      } else {
-        // B4 - innerNodes - After
-        var before = document.createTextNode(startNode.data.substring(0, range.startNodeIndex));
-        var after = document.createTextNode(endNode.data.substring(range.endNodeIndex));
-        var elA = makeReplacementNode(startNode.data.substring(range.startNodeIndex), matchIndex);
-        var elB = makeReplacementNode(endNode.data.substring(0, range.endNodeIndex), matchIndex);
-        var innerEls = [];
-        //elA.appendChild(document.createTextNode());
-        startNode.parentNode.insertBefore(before, startNode);
-        startNode.parentNode.insertBefore(elA, startNode);
-        startNode.parentNode.removeChild(startNode);
-        endNode.parentNode.insertBefore(elB, endNode);
-        endNode.parentNode.insertBefore(after, endNode);
-        endNode.parentNode.removeChild(endNode);
-        for (var i = 0, l = range.innerNodes.length; i < l; ++i) {
-          var innerNode = range.innerNodes[i];
-          var innerEl = makeReplacementNode(innerNode.data, matchIndex);
-          innerNode.parentNode.replaceChild(innerEl, innerNode);
-          innerEls.push(innerEl);
-        }
-        reverts.push(function() {
-          innerEls.unshift(elA);
-          innerEls.push(elB);
-          for (var i = 0, l = innerEls.length; i < l; ++i) {
-            var el = innerEls[i];
-            var pnode = el.parentNode;
-            pnode.insertBefore(el.firstChild, el);
-            pnode.removeChild(el);
-            pnode.normalize();
-          }
-        });
-        return elB;
-      }
-    };
-
-  }
-
-  return findAndReplaceDOMText;
-
-}());
+window.findAndReplaceDOMText=function(){function e(e,r,s){var o,u,a=[],f=t(r),l=i(s);if(!f)return;if(e.global)while(o=e.exec(f)){if(!o[0])throw"findAndReplaceDOMText cannot handle zero-length matches";a.push([e.lastIndex-o[0].length,e.lastIndex,o])}else{o=f.match(e),u=f.indexOf(o[0]);if(!o[0])throw"findAndReplaceDOMText cannot handle zero-length matches";a.push([u,u+o[0].length,o])}a.length&&n(r,a,l)}function t(e){if(e.nodeType===3)return e.data;var n="";if(e=e.firstChild)do n+=t(e);while(e=e.nextSibling);return n}function n(e,t,n){var r,i,s,o,u,a,f=[],l=0,c=e,h=t.shift(),p=0;e:for(;;){c.nodeType===3&&(!o&&c.length+l>=h[1]?(o=c,a=h[1]-l):s&&f.push(c),!s&&c.length+l>h[0]&&(s=c,u=h[0]-l),l+=c.length);if(s&&o){c=n({startNode:s,startNodeIndex:u,endNode:o,endNodeIndex:a,innerNodes:f,match:h[2],matchIndex:p}),l-=o.length-a,s=null,o=null,f=[],h=t.shift(),p++;if(!h)break}else if(c.firstChild||c.nextSibling){c=c.firstChild||c.nextSibling;continue}for(;;){if(c.nextSibling){c=c.nextSibling;break}if(c.parentNode===e)break e;c=c.parentNode}}}function i(e){r=[];var t;if(typeof e!="function"){var n=e.nodeType?e:document.createElement(e);t=function(e){var t=document.createElement("div"),r;return t.innerHTML=n.outerHTML||(new XMLSerializer).serializeToString(n),r=t.firstChild,e&&r.appendChild(document.createTextNode(e)),r}}else t=e;return function(n){var i=n.startNode,s=n.endNode,o=n.matchIndex;if(i===s){var u=i;if(n.startNodeIndex>0){var a=document.createTextNode(u.data.substring(0,n.startNodeIndex));u.parentNode.insertBefore(a,u)}var f=t(n.match[0],o);u.parentNode.insertBefore(f,u);if(n.endNodeIndex<u.length){var l=document.createTextNode(u.data.substring(n.endNodeIndex));u.parentNode.insertBefore(l,u)}return u.parentNode.removeChild(u),r.push(function(){var e=f.parentNode;e.insertBefore(f.firstChild,f),e.removeChild(f),e.normalize()}),f}var a=document.createTextNode(i.data.substring(0,n.startNodeIndex)),l=document.createTextNode(s.data.substring(n.endNodeIndex)),c=t(i.data.substring(n.startNodeIndex),o),h=[];for(var p=0,d=n.innerNodes.length;p<d;++p){var v=n.innerNodes[p],m=t(v.data,o);v.parentNode.replaceChild(m,v),h.push(m)}var g=t(s.data.substring(0,n.endNodeIndex),o);return i.parentNode.insertBefore(a,i),i.parentNode.insertBefore(c,i),i.parentNode.removeChild(i),s.parentNode.insertBefore(g,s),s.parentNode.insertBefore(l,s),s.parentNode.removeChild(s),r.push(function(){h.unshift(c),h.push(g);for(var e=0,t=h.length;e<t;++e){var n=h[e],r=n.parentNode;r.insertBefore(n.firstChild,n),r.removeChild(n),r.normalize()}}),g}}var r;return e.revert=function(){for(var t=0,n=r.length;t<n;++t)r[t]();r=[]},e}()
