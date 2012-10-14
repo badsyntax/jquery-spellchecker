@@ -208,8 +208,6 @@
       '</div>'
     ].join('')).appendTo(body);
 
-    // console.log(this.element);
-
     this.words = $([
       '<div class="words">',
       '</div>'
@@ -361,19 +359,7 @@
     this.element = element;
   };
 
-  /* Spellchecker text parser
-   *************************/
-
-  var TextParser = function() {
-    Parser.apply(this, arguments);
-  };
-  inherits(TextParser, Parser);
-
-  TextParser.prototype.getText = function() {
-    return this.clean(this.element.val());
-  };
-
-  TextParser.prototype.clean = function(text) {
+  Parser.prototype.clean = function(text) {
 
     var tagExpression = '<[^>]+>';
     var punctuationExpression = '^[^a-zA-Z\\u00A1-\\uFFFF]|[^a-zA-Z\\u00A1-\\uFFFF]+[^a-zA-Z\\u00A1-\\uFFFF]|[^a-zA-Z\\u00A1-\\uFFFF]$|\\n|\\t|\\s{2,}';
@@ -384,6 +370,18 @@
 
     return text;
   };
+
+  /* Spellchecker text parser
+   *************************/
+
+  var TextParser = function() {
+    Parser.apply(this, arguments);
+  };
+  inherits(TextParser, Parser);
+
+  TextParser.prototype.getText = function() {
+    return this.clean(this.element.val());
+  };  
 
   TextParser.prototype.replaceWordInText = function(text, oldWord, newWord) {
     return text
@@ -418,7 +416,7 @@
   inherits(HtmlParser, Parser);
 
   HtmlParser.prototype.getText = function() {
-    return this.element.text();
+    return this.clean(this.element.text());
   };
 
   HtmlParser.prototype.replace = function(regExp, replaceText) {
@@ -470,7 +468,7 @@
     }
 
     this.incorrectWords = incorrectWords;
-    
+
     var exp = '\\b' + incorrectWords.join('|') + '\\b'
     var regExp = new RegExp(exp, 'g') 
 
@@ -600,6 +598,7 @@
   $.SpellChecker = SpellChecker;
 
 }(jQuery));
+
 /**
  * findAndReplaceDOMText v 0.11
  * @author James Padolsey http://james.padolsey.com
