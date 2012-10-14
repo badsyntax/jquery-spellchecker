@@ -175,7 +175,8 @@
   /* Suggest box
    *************************/
 
-  var SuggestBox = function(config) {
+  var SuggestBox = function(config, element) {
+    this.element = element;
     Box.apply(this, arguments);
   };
   inherits(SuggestBox, Box);
@@ -187,11 +188,15 @@
     this.container.on('click.' + pluginName, '.ignore-forever', this.handler('ignore.forever'));
     this.container.on('click.' + pluginName, '.words a', this.onSelectWord.bind(this));
     $('html').on('click.' + pluginName, this.onWindowClick.bind(this));
+    if (this.element[0].nodeName === 'BODY') {
+      this.element.parent().on('click.' + pluginName, this.onWindowClick.bind(this));
+    }
   };
 
   SuggestBox.prototype.createBox = function() {
 
     var local = this.config.local;
+    var body = this.element[0].nodeName === 'BODY' ? this.element : 'body';
 
     this.container = $([
       '<div class="' + pluginName + '-suggestbox">',
@@ -201,7 +206,9 @@
       '   <a href="#" class="ignore-forever">' + local.ignoreForever + '</a>',
       ' </div>',
       '</div>'
-    ].join('')).appendTo('body');
+    ].join('')).appendTo(body);
+
+    // console.log(this.element);
 
     this.words = $([
       '<div class="words">',
@@ -363,7 +370,19 @@
   inherits(TextParser, Parser);
 
   TextParser.prototype.getText = function() {
-    return this.element.val();
+    return this.clean(this.element.val());
+  };
+
+  TextParser.prototype.clean = function(text) {
+
+    var tagExpression = '<[^>]+>';
+    var punctuationExpression = '^[^a-zA-Z\\u00A1-\\uFFFF]|[^a-zA-Z\\u00A1-\\uFFFF]+[^a-zA-Z\\u00A1-\\uFFFF]|[^a-zA-Z\\u00A1-\\uFFFF]$|\\n|\\t|\\s{2,}';
+
+    text = $.trim(text);
+    text = text.replace(new RegExp(tagExpression, 'g'), ''); // strip any html tags
+    text = text.replace(new RegExp(punctuationExpression, 'g'), ' '); // strip any punctuation
+
+    return text;
   };
 
   TextParser.prototype.replaceWordInText = function(text, oldWord, newWord) {
@@ -382,10 +401,10 @@
       );
   };
 
-  TextParser.prototype.replaceWord = function(oldWord, replaceMent) {
+  TextParser.prototype.replaceWord = function(oldWord, replacement) {
 
     var oldText = this.element.val();
-    var newText = this.replaceWordInText(oldText, oldWord, replaceMent);
+    var newText = this.replaceWordInText(oldText, oldWord, replacement);
 
     this.element.val(newText);
   };
@@ -415,7 +434,7 @@
     var replaceFill;
     var c;
 
-    this.replace(new RegExp(oldWord, 'g'), function(fill, i){
+    this.replace(new RegExp('\\b' + oldWord + '\\b', 'g'), function(fill, i){
 
       // Reset the replacement for each match
       if (i !== c) {
@@ -452,7 +471,7 @@
 
     this.incorrectWords = incorrectWords;
     
-    var exp = incorrectWords.join('|');
+    var exp = '\\b' + incorrectWords.join('|') + '\\b'
     var regExp = new RegExp(exp, 'g') 
 
     this.replace(regExp, function(fill, i) {
@@ -492,7 +511,7 @@
   };
 
   SpellChecker.prototype.setupSuggestBox = function() {
-    this.suggestBox = new SuggestBox(this.config);
+    this.suggestBox = new SuggestBox(this.config, this.element);
   };
 
   SpellChecker.prototype.setupIncorrectWords = function() {
@@ -522,25 +541,10 @@
 
   /* Pubic API methods */
 
-  SpellChecker.prototype.getWordsFromText = function(text) {
-
-    var tagExpression = '<[^>]+>';
-    var punctuationExpression = '^[^a-zA-Z\\u00A1-\\uFFFF]|[^a-zA-Z\\u00A1-\\uFFFF]+[^a-zA-Z\\u00A1-\\uFFFF]|[^a-zA-Z\\u00A1-\\uFFFF]$|\\n|\\t|\\s{2,}';
-
-    text = $.trim(text);
-    text = text.replace(new RegExp(tagExpression, 'g'), ''); // strip any html tags
-    text = text.replace(new RegExp(punctuationExpression, 'g'), ' '); // strip any punctuation
-
-    return text;
-  };
-
   SpellChecker.prototype.check = function() {
-
-    var text = this.parser.getText();
-    var words = this.getWordsFromText(text);
-
     this.incorrectWords.loading(true);
-    this.driver.checkWords(words, this.onCheckWords.bind(this));
+    var text = this.parser.getText();
+    this.driver.checkWords(text, this.onCheckWords.bind(this));
   };
 
   SpellChecker.prototype.showSuggestedWords = function(word, element) {
