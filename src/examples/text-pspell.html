@@ -9,8 +9,8 @@
   <link rel="stylesheet" type="text/css" media="screen" href="../css/jquery.spellchecker.css" />
 </head>
 <body>
-    <h1>Basic usage</h1>
-    <p>Here, we'll just check if a string of words contain any incorrectly spelt words.</p>
+    <h1>Word suggestion usage</h1>
+    <p>This example demonstrates how the <em>text parser</em> can be used to check the spelling of text in a form field.</p>
     <p>
       <label for="text-content">
         Add your own text and check the spelling (in english):
@@ -18,6 +18,7 @@
     </p>
     <div>
       <textarea id="text-content" rows="5" cols="25">Here is a sentense.</textarea>
+      <div id="incorrect-word-list"></div>
     </div>
     <button id="check-textarea">
       Check Spelling
@@ -35,19 +36,24 @@
       var spellchecker = new $.SpellChecker(element, {
         parser: 'text',
         engine: {
-          lang: "en",
-          type: "PSpell",
-          path: "../php/checkspelling.php"
+          path: "../php/spellchecker.php",
+          driver: {
+            lang: 'en',
+            type: 'pspell',
+            dictionary: ''
+          }
+        },
+        suggestBox: {
+          position: 'above'
+        },
+        incorrectWords: {
+          container: '#incorrect-word-list'
         }
       });
 
       // Bind spellchecker handler functions
-      spellchecker.on('spellchecker.check.success', function() {
+      spellchecker.on('check.success', function() {
         alert('There are no incorrectly spelt words.');
-      });
-
-      spellchecker.on('spellchecker.check.fail', function() {
-        alert('Some words have been incorrectly spelt.');
       });
 
       // Check the spelling

@@ -7,17 +7,16 @@
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width">
   <link rel="stylesheet" type="text/css" media="screen" href="../css/jquery.spellchecker.css" />
+  <style type="text/css">
+  #text-content {width:400px;border:1px solid #888;padding:1em;margin:0 0 1em 0;}
+  </style>
 </head>
 <body>
-    <h1>Basic usage</h1>
-    <p>Here, we'll just check if a string of words contain any incorrectly spelt words.</p>
-    <p>
-      <label for="text-content">
-        Add your own text and check the spelling (in english):
-      </label>
-    </p>
-    <div>
-      <textarea id="text-content" rows="5" cols="25">Here is a sentense.</textarea>
+    <h1>Word suggestion usage</h1>
+    <p>This example demonstrates how the <em>html parser</em> can be used to check the spelling of text within a DOM tree.</p>
+
+    <div id="text-content">
+      Here is a <strong>sent<em>en</em>se</strong>.
     </div>
     <button id="check-textarea">
       Check Spelling
@@ -26,34 +25,34 @@
   <script type="text/javascript" src="../../libs/jquery/jquery-1.8.2.min.js"></script>
   <script type="text/javascript" src="../js/jquery.spellchecker.js"></script>
   <script type="text/javascript">
-
     (function() {
 
-      var element = $('#text-content');
-      
-      // Init the text spellchecker
-      var spellchecker = new $.SpellChecker(element, {
-        parser: 'text',
+      // Init the html spellchecker
+      var spellchecker = new $.SpellChecker('#text-content', {
+        parser: 'html',
         engine: {
-          lang: "en",
-          type: "PSpell",
-          path: "../php/checkspelling.php"
+          path: "../php/spellchecker.php",
+          driver: {
+            lang: 'en',
+            type: 'PSpell',
+            dictionary: ''
+          }
+        },
+        suggestBox: {
+          position: 'below'
         }
       });
 
       // Bind spellchecker handler functions
-      spellchecker.on('spellchecker.check.success', function() {
-        alert('There are no incorrectly spelt words.');
-      });
-
-      spellchecker.on('spellchecker.check.fail', function() {
-        alert('Some words have been incorrectly spelt.');
+      spellchecker.on('check.success', function() {
+        alert('There are no incorrectly spelt words!');
       });
 
       // Check the spelling
       $("#check-textarea").click(function(e){
         spellchecker.check();
       });
+
     })();
   </script>
 </body>

@@ -1,6 +1,7 @@
 <?php
 /**
  * Spellchecker Google driver class
+ * !! Curl is required to use the google spellchecker API !!
  *
  * @package    jQuery Spellchecker (https://github.com/badsyntax/jquery-spellchecker)
  * @category   Core
@@ -25,7 +26,7 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
 
     $matches = $this->get_matches($word);
 
-    if (isset($matches[0][4]))
+    if (isset($matches[0][4]) AND trim($matches[0][4]) !== '')
     {
       $suggestions = explode("\t", $matches[0][4]);
     }

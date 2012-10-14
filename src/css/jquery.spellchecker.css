@@ -1,32 +1,44 @@
+/*
+ * jQuery Spellchecker
+ * https://github.com/badsyntax/jquery-spellchecker
+ *
+ * Copyright (c) 2012 Richard Willis
+ * Licensed under the MIT license.
+ */
 .spellchecker-suggestbox {
-	position: absolute;
-	display: none;
-	z-index: 9999;
-	overflow: none;
-	font: normal 13px arial;
-	box-shadow: 0 0 4px #aaa;
-	background: #fff;
-	border: 1px solid #bbb;
+  position: absolute;
+  display: none;
+  z-index: 9999;
+  overflow: none;
+  font: normal 13px arial;
+  box-shadow: 0 0 4px #aaa;
+  background: #fff;
+  border: 1px solid #bbb;
 }
 .spellchecker-suggestbox .loading {
-	padding: 3px 6px;
-	font-style: italic;
+  padding: 3px 6px;
+  font-style: italic;
 }
 .spellchecker-suggestbox a {
-	outline: none;
-	color: #333;
-	padding: 3px 6px;
-	display: block;
-	text-decoration: none;
+  outline: none;
+  color: #333;
+  padding: 3px 6px;
+  display: block;
+  text-decoration: none;
 }
 .spellchecker-suggestbox a:hover {
-	color: #000;
-	background: #ddd;
+  color: #000;
+  background: #ddd;
 }
-.spellchecker-suggestbox-footer {
-	border-top: 1px solid #ddd;
+.spellchecker-suggestbox .footer {
+  border-top: 1px solid #ddd;
 }
-.spellchecker-suggestbox-footer .ignore-all,
-.spellchecker-suggestbox-footer .ignore-forever {
-	display: none;
+.spellchecker-suggestbox .footer .ignore-all,
+.spellchecker-suggestbox .footer .ignore-forever {
+  display: none;
+}
+.spellchecker-word-highlight {
+  color: red;
+  cursor: pointer;
+  border-bottom: 1px dotted red;
 }

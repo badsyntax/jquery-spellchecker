@@ -10,7 +10,7 @@
 </head>
 <body>
     <h1>Word suggestion usage</h1>
-    <p>Here, we'll show a suggestion of words for each incorrectly spelt words.</p>
+    <p>This example demonstrates how the <em>text parser</em> can be used to check the spelling of text in a form field.</p>
     <p>
       <label for="text-content">
         Add your own text and check the spelling (in english):
@@ -32,14 +32,14 @@
 
       var element = $('#text-content');
       
-      // Init the spellchecker on a textarea
+      // Init the text spellchecker
       var spellchecker = new $.SpellChecker(element, {
+        parser: 'text',
         engine: {
           path: "../php/spellchecker.php",
           driver: {
             lang: 'en',
-            type: 'PSpell',
-            dictionary: ''
+            type: 'google'
           }
         },
         suggestBox: {
@@ -51,10 +51,6 @@
       });
 
       // Bind spellchecker handler functions
-      spellchecker.on('requestError', function(){
-        alert('Sorry, there was an error processing the request.');
-      });
-
       spellchecker.on('check.success', function() {
         alert('There are no incorrectly spelt words.');
       });

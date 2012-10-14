@@ -1,6 +1,7 @@
 <?php
 /**
  * Spellchecker PSpell driver class
+ * !! Aspell and PHP Pspell are required !!
  *
  * @package    jQuery Spellchecker (https://github.com/badsyntax/jquery-spellchecker)
  * @category   Core
@@ -21,7 +22,7 @@ class SpellChecker_Driver_PSpell extends Spellchecker_Driver
   {
     parent::__construct();
 
-    $this->pspell_link = pspell_new($this->_config['language']);
+    $this->pspell_link = pspell_new($this->_config['lang']);
   }
 
   public function get_suggestions()
