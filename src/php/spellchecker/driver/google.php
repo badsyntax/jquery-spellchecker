@@ -4,10 +4,9 @@
  * !! Curl is required to use the google spellchecker API !!
  *
  * @package    jQuery Spellchecker (https://github.com/badsyntax/jquery-spellchecker)
- * @category   Core
  * @author     Richard Willis
  * @copyright  (c) Richard Willis
- * @license    MIT
+ * @license    https://github.com/badsyntax/jquery-spellchecker/blob/master/LICENSE-MIT
  */
 
 class SpellChecker_Driver_Google extends Spellchecker_Driver
@@ -18,9 +17,7 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
 
   public function get_suggestions()
   {
-    $word = $_POST['word'];
-    
-    $word = urldecode($word);
+    $word = urldecode($_POST['word']);
 
     $suggestions = array();
 
@@ -36,9 +33,7 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
 
   public function get_incorrect_words()
   {
-    $text = $_POST['text'];
-
-    $text = urldecode($text);
+    $text = urldecode($_POST['text']);
 
     $words = $this->get_matches($text);
 
@@ -56,29 +51,25 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
 
   private function get_matches($text)
   {
+    $xml_response = '';
     $url = 'https://www.google.com/tbproxy/spell?lang='.$this->_config['lang'];
 
-    // Setup XML request
     $body = '<?xml version="1.0" encoding="utf-8" ?>';
     $body .= '<spellrequest textalreadyclipped="0" ignoredups="0" ignoredigits="1" ignoreallcaps="1">';
     $body .= '<text>'.$text.'</text></spellrequest>';
 
-    // response data
-    $xml_response = '';
-
-    // use curl if it exists
-    if (function_exists('curl_init')) {
-      $ch = curl_init();
-      curl_setopt($ch, CURLOPT_URL,$url);
-      curl_setopt($ch, CURLOPT_POST, 1);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-      curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
-      curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-      $xml_response = curl_exec($ch);
-      curl_close($ch);
-    } else {
+    if (!function_exists('curl_init')) {
       exit('Curl is not available');
     }
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL,$url);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+    $xml_response = curl_exec($ch);
+    curl_close($ch);
 
     // grab and parse content, remove google XML formatting
     $matches = array();

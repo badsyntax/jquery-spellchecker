@@ -4,10 +4,9 @@
  * !! Aspell and PHP Pspell are required !!
  *
  * @package    jQuery Spellchecker (https://github.com/badsyntax/jquery-spellchecker)
- * @category   Core
  * @author     Richard Willis
  * @copyright  (c) Richard Willis
- * @license    MIT
+ * @license    https://github.com/badsyntax/jquery-spellchecker/blob/master/LICENSE-MIT
  */
 
 class SpellChecker_Driver_PSpell extends Spellchecker_Driver
@@ -27,9 +26,7 @@ class SpellChecker_Driver_PSpell extends Spellchecker_Driver
 
   public function get_suggestions()
   {
-    $word = $_POST['word'];
-    
-    $word = urldecode($word);
+    $word = urldecode($_POST['word']);
 
     $suggestions = pspell_suggest($this->pspell_link, $word);
 
@@ -38,14 +35,12 @@ class SpellChecker_Driver_PSpell extends Spellchecker_Driver
 
   public function get_incorrect_words()
   {
-    $text = $_POST['text'];
+    $text = urldecode($_POST['text']);
+
+    $words = explode(' ', $text);
 
     $incorrect_words = array();
 
-    $text = urldecode($text);
-
-    $words = explode(' ', $text);
-    
     foreach($words as $word)
     {
       if (!pspell_check($this->pspell_link, $word))
@@ -60,14 +55,14 @@ class SpellChecker_Driver_PSpell extends Spellchecker_Driver
   public function add_to_dictionary()
   {
     $pspell_config = pspell_config_create('en');
-    
+
     pspell_config_personal($pspell_config, $this->pspell_personal_dictionary) or die('can\'t find pspell dictionary');
-    
+
     $this->pspell_link = pspell_new_config($pspell_config);
-    
+
     pspell_add_to_personal($this->pspell_link, strtolower($addtodictionary)) or die('You can\'t add a word to the dictionary that contains any punctuation.');
     pspell_save_wordlist($this->pspell_link);
-    
+
     $this->send_data('success');
   }
 

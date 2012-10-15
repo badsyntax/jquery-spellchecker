@@ -3,10 +3,9 @@
  * Spellchecker driver class
  *
  * @package    jQuery Spellchecker (https://github.com/badsyntax/jquery-spellchecker)
- * @category   Core
  * @author     Richard Willis
  * @copyright  (c) Richard Willis
- * @license    MIT
+ * @license    https://github.com/badsyntax/jquery-spellchecker/blob/master/LICENSE-MIT
  */
 
 abstract class SpellChecker_Driver {
@@ -21,7 +20,7 @@ abstract class SpellChecker_Driver {
   }
 
   public function send_data($outcome, $data) {
-    
+
     $response = $data;
 
     if ($outcome !== NULL)
