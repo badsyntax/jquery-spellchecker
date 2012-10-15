@@ -28,7 +28,8 @@
     },
     suggestBox: {
       numWords: 5,
-      position: 'above'
+      position: 'above',
+      offset: 2
     },
     incorrectWords: {
       container: 'body' //selector
@@ -70,7 +71,7 @@
     },
     trigger: function(name) {
       var handlers = this.handlers[name];
-      if (!this.handlers) {
+      if (!handlers) {
         return;
       }
       var args = Array.prototype.slice.call(arguments, 1);
@@ -242,7 +243,7 @@
 
   SuggestBox.prototype.loadSuggestedWords = function(getWords, word, wordElement) {
 
-    this.wordElement = wordElement;
+    this.wordElement = $(wordElement);
     this.loading(true);
 
     getWords(word, this.onGetWords.bind(this));
@@ -254,22 +255,34 @@
     this.words.html(show ? this.loadingMsg : '');
   };
 
-  SuggestBox.prototype.position = function(element) {
+  SuggestBox.prototype.position = function() {
 
-    element = $(element);
-    element = element.data('firstElement') || element;
-
+    var win = $(window);
+    var element = this.wordElement.data('firstElement') || this.wordElement;
     var offset = element.offset();
+    var boxOffset = this.config.suggestBox.offset;
+    var containerHeight = this.container.outerHeight();
+    
+    var positionAbove = (offset.top - containerHeight - boxOffset);
+    var positionBelow = (offset.top + element.outerHeight() + boxOffset);
+
     var left = offset.left;
-    var positionAbove = (offset.top - this.container.height()) + "px";
-    var positionBelow = (offset.top + element.outerHeight());
-    var top = (this.config.suggestBox.position === 'above') ? positionAbove : positionBelow;
+    var top;
+    
+    if (this.config.suggestBox.position === 'below') {
+      top = positionBelow;
+      if (win.height() + win.scrollTop() < positionBelow + containerHeight) {
+        top = positionAbove;
+      }
+    } else {
+      top = positionAbove;
+    }
 
     this.container.css({ top: top, left: left });
   };
 
   SuggestBox.prototype.open = function() {
-    this.position(this.wordElement);
+    this.position();
     this.container.fadeIn(180);
   };
 
@@ -283,6 +296,7 @@
     this.loading(false);
     this.addWords(words);
     this.footer.show();
+    this.position();
   };
 
   SuggestBox.prototype.onContainerClick = function(e) {
