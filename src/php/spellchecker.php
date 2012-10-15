@@ -41,9 +41,12 @@ class SpellChecker {
 		require_once 'spellchecker/driver.php';
 		require_once 'spellchecker/driver/'.strtolower($driver).'.php';
 
-		$spellchecker_driver = 'Spellchecker_Driver_'.ucfirst($driver);
+		$config = array(
+			'lang' => $_POST['lang']
+		);
+		$driver = 'Spellchecker_Driver_'.ucfirst($driver);
 
-		$this->driver = new $spellchecker_driver;
+		$this->driver = new $driver($config);
 	}
 
 	public function execute_action($action = NULL)

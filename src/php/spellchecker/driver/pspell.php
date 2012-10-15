@@ -17,11 +17,11 @@ class SpellChecker_Driver_PSpell extends Spellchecker_Driver
     'lang' => 'en'
   );
 
-  public function __construct()
+  public function __construct($config = array())
   {
-    parent::__construct();
+    parent::__construct($config);
 
-    $this->pspell_link = pspell_new($this->_config['lang']);
+    $this->pspell_link = pspell_new($this->_config['lang'], '', '', 'utf-8');
   }
 
   public function get_suggestions()

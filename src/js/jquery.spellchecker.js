@@ -12,12 +12,10 @@
    *************************/
 
   var defaultConfig = {
+    lang: 'en',
     engine: {
       path: 'spellchecker.php',
-      driver: {
-        type: 'PSpell',
-        lang: 'en',
-      },
+      driver: 'PSpell'
     },
     local: {
       requestError: 'There was an error processing the request.',
@@ -188,14 +186,15 @@
   inherits(SuggestBox, Box);
 
   SuggestBox.prototype.bindEvents = function() {
-    this.container.on('click.' + pluginName, this.onContainerClick.bind(this));
-    this.container.on('click.' + pluginName, '.ignore-word', this.handler('ignore.word'));
-    this.container.on('click.' + pluginName, '.ignore-all', this.handler('ignore.all'));
-    this.container.on('click.' + pluginName, '.ignore-forever', this.handler('ignore.forever'));
-    this.container.on('click.' + pluginName, '.words a', this.onSelectWord.bind(this));
-    $('html').on('click.' + pluginName, this.onWindowClick.bind(this));
+    var click = 'click.' + pluginName;
+    this.container.on(click, this.onContainerClick.bind(this));
+    this.container.on(click, '.ignore-word', this.handler('ignore.word'));
+    this.container.on(click, '.ignore-all', this.handler('ignore.all'));
+    this.container.on(click, '.ignore-forever', this.handler('ignore.forever'));
+    this.container.on(click, '.words a', this.onSelectWord.bind(this));
+    $('html').on(click, this.onWindowClick.bind(this));
     if (this.element[0].nodeName === 'BODY') {
-      this.element.parent().on('click.' + pluginName, this.onWindowClick.bind(this));
+      this.element.parent().on(click, this.onWindowClick.bind(this));
     }
   };
 
@@ -229,6 +228,8 @@
   };
 
   SuggestBox.prototype.addWords = function(words) {
+
+    // console.log(words);
 
     var html = $.map(words, function(word) {
       return '<a href="#">' + word + '</a>';
@@ -320,8 +321,8 @@
       dataType: 'json',
       cache: false,
       data: {
-        lang: config.engine.driver.lang,
-        driver: config.engine.driver.type
+        lang: config.lang,
+        driver: config.engine.driver
       },
       error: function() {
         alert(config.local.requestError);
@@ -579,9 +580,9 @@
 
   SpellChecker.prototype.onSuggestedWordSelect = function(e, word, element) {
     e.preventDefault();
-    this.parser.replaceWord(this.badWord, word);
+    this.parser.replaceWord(this.incorrectWord, word);
     this.suggestBox.close();
-    // this.badWordElement.remove();
+    // this.incorrectWordElement.remove();
   };
 
   SpellChecker.prototype.onIgnoreWord = function() {
@@ -598,8 +599,8 @@
 
   SpellChecker.prototype.onIncorrectWordSelect = function(e, word, element) {
     e.preventDefault();
-    this.badWord = word;
-    this.badWordElement = element;
+    this.incorrectWord = word;
+    this.incorrectWordElement = element;
     this.showSuggestedWords(word, element);
   };
 
