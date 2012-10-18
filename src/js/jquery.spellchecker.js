@@ -56,26 +56,21 @@
    *************************/
 
   var Events = function(){
-    this.handlers = {};
+    this._handlers = {};
   };
 
   Events.prototype = {
     on: function(name, handler) {
-      if (!this.handlers[name]) {
-        this.handlers[name] = [handler];
-      } else {
-        this.handlers[name].push(handler);
+      if (!this._handlers[name]) {
+        this._handlers[name] = $.Callbacks();
       }
+      this._handlers[name].add(handler);
     },
     trigger: function(name) {
-      var handlers = this.handlers[name];
-      if (!handlers) {
-        return;
+      if (this._handlers[name]) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        this._handlers[name].fireWith(this, args);
       }
-      var args = Array.prototype.slice.call(arguments, 1);
-      $.each(handlers, function(i, handler) {
-        handler.apply(this, args);
-      }.bind(this));
     },
     handler: function(name) {
       return function(e) {
@@ -181,6 +176,7 @@
 
   var SuggestBox = function(config, element) {
     this.element = element;
+    this.body = this.element[0].nodeName === 'BODY' ? this.element : 'body';
     Box.apply(this, arguments);
   };
   inherits(SuggestBox, Box);
@@ -201,7 +197,6 @@
   SuggestBox.prototype.createBox = function() {
 
     var local = this.config.local;
-    var body = this.element[0].nodeName === 'BODY' ? this.element : 'body';
 
     this.container = $([
       '<div class="' + pluginName + '-suggestbox">',
@@ -211,7 +206,7 @@
       '   <a href="#" class="ignore-forever">' + local.ignoreForever + '</a>',
       ' </div>',
       '</div>'
-    ].join('')).appendTo(body);
+    ].join('')).appendTo(this.body);
 
     this.words = $([
       '<div class="words">',
@@ -228,8 +223,6 @@
   };
 
   SuggestBox.prototype.addWords = function(words) {
-
-    // console.log(words);
 
     var html = $.map(words, function(word) {
       return '<a href="#">' + word + '</a>';
@@ -254,6 +247,7 @@
     this.footer.hide();
     this.open();
     this.words.html(show ? this.loadingMsg : '');
+    this.position();
   };
 
   SuggestBox.prototype.position = function() {
@@ -263,13 +257,13 @@
     var offset = element.offset();
     var boxOffset = this.config.suggestBox.offset;
     var containerHeight = this.container.outerHeight();
-    
+
     var positionAbove = (offset.top - containerHeight - boxOffset);
     var positionBelow = (offset.top + element.outerHeight() + boxOffset);
 
     var left = offset.left;
     var top;
-    
+
     if (this.config.suggestBox.position === 'below') {
       top = positionBelow;
       if (win.height() + win.scrollTop() < positionBelow + containerHeight) {
@@ -291,6 +285,14 @@
     this.container.fadeOut(100, function(){
       this.footer.hide();
     }.bind(this));
+  };
+
+  SuggestBox.prototype.detach = function() {
+    this.container = this.container.detach();
+  };
+
+  SuggestBox.prototype.reattach = function() {
+    this.container.appendTo(this.body);
   };
 
   SuggestBox.prototype.onGetWords = function(words) {
@@ -420,7 +422,16 @@
   inherits(HtmlParser, Parser);
 
   HtmlParser.prototype.getText = function() {
-    return this.clean(this.element.text());
+
+    var element = this.element
+      .clone()
+      .find('[class^="spellchecker-"]')
+      .remove()
+      .end();
+
+    var text = this.element.text();
+
+    return this.clean(text);
   };
 
   HtmlParser.prototype.replaceText = function(regExp, replaceText) {
@@ -494,9 +505,9 @@
         replaceElement = span;
       }
 
-      // We save the first replacement element so we 
-      // can position the suggest box correctly. 
-      span.data('firstElement', replaceElement); 
+      // We save the first replacement element so we
+      // can position the suggest box correctly.
+      span.data('firstElement', replaceElement);
 
       return span[0];
     });
@@ -575,13 +586,17 @@
   };
 
   SpellChecker.prototype.onCheckFail = function(badWords) {
+    this.suggestBox.detach();
     this.incorrectWords.addWords(badWords);
+    this.suggestBox.reattach();
   };
 
   SpellChecker.prototype.onSuggestedWordSelect = function(e, word, element) {
     e.preventDefault();
-    this.parser.replaceWord(this.incorrectWord, word);
     this.suggestBox.close();
+    this.suggestBox.detach();
+    this.parser.replaceWord(this.incorrectWord, word);
+    this.suggestBox.reattach();
     // this.incorrectWordElement.remove();
   };
 
@@ -616,6 +631,5 @@
  * Matches the text of a DOM node against a regular expression
  * and replaces each match (or node-separated portions of the match)
  * in the specified element.
- *
  */
 window.findAndReplaceDOMText=function(){function e(e,r,s){var o,u,a=[],f=t(r),l=i(s);if(!f)return;if(e.global)while(o=e.exec(f)){if(!o[0])throw"findAndReplaceDOMText cannot handle zero-length matches";a.push([e.lastIndex-o[0].length,e.lastIndex,o])}else{o=f.match(e),u=f.indexOf(o[0]);if(!o[0])throw"findAndReplaceDOMText cannot handle zero-length matches";a.push([u,u+o[0].length,o])}a.length&&n(r,a,l)}function t(e){if(e.nodeType===3)return e.data;var n="";if(e=e.firstChild)do n+=t(e);while(e=e.nextSibling);return n}function n(e,t,n){var r,i,s,o,u,a,f=[],l=0,c=e,h=t.shift(),p=0;e:for(;;){c.nodeType===3&&(!o&&c.length+l>=h[1]?(o=c,a=h[1]-l):s&&f.push(c),!s&&c.length+l>h[0]&&(s=c,u=h[0]-l),l+=c.length);if(s&&o){c=n({startNode:s,startNodeIndex:u,endNode:o,endNodeIndex:a,innerNodes:f,match:h[2],matchIndex:p}),l-=o.length-a,s=null,o=null,f=[],h=t.shift(),p++;if(!h)break}else if(c.firstChild||c.nextSibling){c=c.firstChild||c.nextSibling;continue}for(;;){if(c.nextSibling){c=c.nextSibling;break}if(c.parentNode===e)break e;c=c.parentNode}}}function i(e){r=[];var t;if(typeof e!="function"){var n=e.nodeType?e:document.createElement(e);t=function(e){var t=document.createElement("div"),r;return t.innerHTML=n.outerHTML||(new XMLSerializer).serializeToString(n),r=t.firstChild,e&&r.appendChild(document.createTextNode(e)),r}}else t=e;return function(n){var i=n.startNode,s=n.endNode,o=n.matchIndex;if(i===s){var u=i;if(n.startNodeIndex>0){var a=document.createTextNode(u.data.substring(0,n.startNodeIndex));u.parentNode.insertBefore(a,u)}var f=t(n.match[0],o);u.parentNode.insertBefore(f,u);if(n.endNodeIndex<u.length){var l=document.createTextNode(u.data.substring(n.endNodeIndex));u.parentNode.insertBefore(l,u)}return u.parentNode.removeChild(u),r.push(function(){var e=f.parentNode;e.insertBefore(f.firstChild,f),e.removeChild(f),e.normalize()}),f}var a=document.createTextNode(i.data.substring(0,n.startNodeIndex)),l=document.createTextNode(s.data.substring(n.endNodeIndex)),c=t(i.data.substring(n.startNodeIndex),o),h=[];for(var p=0,d=n.innerNodes.length;p<d;++p){var v=n.innerNodes[p],m=t(v.data,o);v.parentNode.replaceChild(m,v),h.push(m)}var g=t(s.data.substring(0,n.endNodeIndex),o);return i.parentNode.insertBefore(a,i),i.parentNode.insertBefore(c,i),i.parentNode.removeChild(i),s.parentNode.insertBefore(g,s),s.parentNode.insertBefore(l,s),s.parentNode.removeChild(s),r.push(function(){h.unshift(c),h.push(g);for(var e=0,t=h.length;e<t;++e){var n=h[e],r=n.parentNode;r.insertBefore(n.firstChild,n),r.removeChild(n),r.normalize()}}),g}}var r;return e.revert=function(){for(var t=0,n=r.length;t<n;++t)r[t]();r=[]},e}()
