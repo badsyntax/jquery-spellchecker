@@ -1,15 +1,20 @@
 # jQuery Spellchecker
 
-A jQuery Spellchecker plugin
-
-## Getting Started
-_(Coming soon)_
+A jQuery Spellchecker plugin, by Richard Willis
 
 ## Documentation
-_(Coming soon)_
+https://github.com/badsyntax/jquery-spellchecker/wiki/Documentation
 
 ## Examples
-_(Coming soon)_
+* http://jquery-spellchecker.badsyntax.co/html.html
+* http://jquery-spellchecker.badsyntax.co/textarea.html
+* http://jquery-spellchecker.badsyntax.co/languages.html
+* http://jquery-spellchecker.badsyntax.co/drivers.html
 
-## Release History
-_(Nothing yet)_
+## Issues
+
+Please post any issue you find in the issue tracker https://github.com/badsyntax/jquery-spellchecker/issues. I gladly accept pull requests too!
+
+## License
+
+Licensed under the MIT license.
