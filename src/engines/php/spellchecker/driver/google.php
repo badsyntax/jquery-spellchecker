@@ -23,9 +23,9 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
 
     $matches = $this->get_matches($word);
 
-    if (isset($matches[0][4]) AND trim($matches[0][4]) !== '')
+    if (isset($matches[0][3]) AND trim($matches[0][3]) !== '')
     {
-      $suggestions = explode("\t", $matches[0][4]);
+      $suggestions = explode("\t", $matches[0][3]);
     }
 
     $this->send_data(NULL, $suggestions);
@@ -39,9 +39,11 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
 
     $incorrect_words = array();
 
+    $text = utf8_decode($text);
+
     foreach($words as $word)
     {
-      $incorrect_words[] = substr($text, $word[1], $word[2]);
+      $incorrect_words[] = utf8_encode(substr($text, $word[0], $word[1]));
     }
 
     $this->send_data('success', $incorrect_words);
@@ -71,11 +73,20 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
     $xml_response = curl_exec($ch);
     curl_close($ch);
 
-    // grab and parse content, remove google XML formatting
-    $matches = array();
-    preg_match_all('/<c o="([^"]*)" l="([^"]*)" s="([^"]*)">([^<]*)<\/c>/', $xml_response, $matches, PREG_SET_ORDER);
+    $xml = simplexml_load_string($xml_response);
 
-    // note: google will return encoded data, no need to encode ut8 characters
+    $matches = array();
+
+    foreach($xml->c as $word)
+    {
+      $matches[] = array(
+        (int) $word->attributes()->o,
+        (int) $word->attributes()->l,
+        (int) $word->attributes()->s,
+        (string) $word
+      );
+    }
+
     return $matches;
   }
 }
