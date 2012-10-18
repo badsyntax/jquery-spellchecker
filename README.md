@@ -3,13 +3,7 @@
 A jQuery Spellchecker plugin
 
 ## Getting Started
-_(Coming soon)_
-
-## Documentation
-_(Coming soon)_
+https://github.com/badsyntax/jquery-spellchecker/wiki/Documentation
 
 ## Examples
-_(Coming soon)_
-
-## Release History
-_(Nothing yet)_
+http://jquery-spellchecker.badsyntax.co
