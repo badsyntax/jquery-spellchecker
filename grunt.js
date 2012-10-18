@@ -1,6 +1,7 @@
 /*global module:false*/
 module.exports = function(grunt) {
 
+
   // Project configuration.
   grunt.initConfig({
     pkg: '<json:spellchecker.jquery.json>',
@@ -13,8 +14,18 @@ module.exports = function(grunt) {
     },
     concat: {
       dist: {
-        src: ['<banner:meta.banner>', '<file_strip_banner:src/js/<%= pkg.name %>.js>'],
+        src: ['<banner:meta.banner>', '<file_strip_banner:src/js/<%= pkg.name %>.js>', '<banner:meta.test'],
         dest: 'dist/js/<%= pkg.name %>.js'
+      }
+    },
+    copy: {
+      dist: {
+        files: {
+          "dist/examples/": "src/examples/*",
+          "dist/css/": "src/css/*",
+          "dist/engines/php/": "src/engines/php/**",
+          "dist/js/libs/jquery/": "src/js/libs/jquery/jquery-1.8.2.min.js"
+        }
       }
     },
     min: {
@@ -23,13 +34,23 @@ module.exports = function(grunt) {
           src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
           dest: 'dist/js/<%= pkg.name %>.min.js'
         }
-        //,
-        // {
-        //   src: 'src/css/<%= pkg.name %>.css',
-        //   dest: 'dist/css/<%= pkg.name %>.min.css'
-        // }
-      
     },
+    mincss: {
+      compress: {
+        files: {
+          "dist/css/jquery.spellchecker.min.css": ["src/css/jquery.spellchecker.css"]
+        }
+      }
+    },
+
+    compress: {
+      zip: {
+        files: {
+          "archive/jquery.spellchecker-<%= pkg.version %>.zip": "dist/**"
+        }
+      }
+    },
+
     // qunit: {
     //   files: ['test/**/*.html']
     // },
@@ -52,13 +73,19 @@ module.exports = function(grunt) {
       },
       globals: {
         jQuery: true,
+        $: true,
         alert: false
       }
     },
     uglify: {}
   });
 
+  grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-mincss');
+  grunt.loadNpmTasks('grunt-contrib-compress');
+
+
   // Default task.
-  grunt.registerTask('default', 'lint concat min');
+  grunt.registerTask('default', 'lint concat min mincss copy compress');
 
 };
