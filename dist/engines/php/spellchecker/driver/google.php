@@ -74,6 +74,7 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
     curl_close($ch);
 
     $xml = simplexml_load_string($xml_response);
+
     $matches = array();
 
     foreach($xml->c as $word)
