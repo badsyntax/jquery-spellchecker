@@ -135,6 +135,10 @@
     this.container.html(show ? this.config.local.loading : '');
   };
 
+  IncorrectWordsBox.prototype.removeWord = function(elem) {
+    elem.remove();
+  };
+
   /* Incorrect words inline
    *************************/
 
@@ -168,6 +172,8 @@
 
     this.trigger('select.word', e, word, element);
   };
+
+  IncorrectWordsInline.prototype.removeWord = function(elem) {};
 
   /* Suggest box
    *************************/
@@ -552,8 +558,6 @@
   SpellChecker.prototype.bindEvents = function() {
     this.on('check.fail', this.onCheckFail.bind(this));
     this.suggestBox.on('ignore.word', this.onIgnoreWord.bind(this));
-    this.suggestBox.on('ignore.all', this.onIgnoreAll.bind(this));
-    this.suggestBox.on('ignore.forever', this.onIgnoreForever.bind(this));
     this.suggestBox.on('select.word', this.onSuggestedWordSelect.bind(this));
     this.incorrectWords.on('select.word', this.onIncorrectWordSelect.bind(this));
   };
@@ -595,19 +599,11 @@
     this.suggestBox.detach();
     this.parser.replaceWord(this.incorrectWord, word);
     this.suggestBox.reattach();
-    // this.incorrectWordElement.remove();
+    this.incorrectWords.removeWord(this.incorrectWordElement);
   };
 
   SpellChecker.prototype.onIgnoreWord = function() {
     alert('Ignore word');
-  };
-
-  SpellChecker.prototype.onIgnoreAll = function() {
-    alert('Ignore all');
-  };
-
-  SpellChecker.prototype.onIgnoreForever = function() {
-    alert('Ignore forever');
   };
 
   SpellChecker.prototype.onIncorrectWordSelect = function(e, word, element) {
