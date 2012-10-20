@@ -1,5 +1,5 @@
 /*
- * jQuery Spellchecker - v0.1.0 - 2012-10-18
+ * jQuery Spellchecker - v0.1.0
  * https://github.com/badsyntax/jquery-spellchecker
  * Copyright (c) 2012 Richard Willis; Licensed MIT
  */
