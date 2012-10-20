@@ -33,14 +33,11 @@
       
       // Init the text spellchecker
       var spellchecker = new $.SpellChecker(element, {
+        lang: 'en',
         parser: 'text',
         engine: {
           path: "../engines/php/spellchecker.php",
-          driver: {
-            lang: 'en',
-            type: 'pspell',
-            dictionary: ''
-          }
+          driver: 'pspell'
         },
         suggestBox: {
           position: 'above'

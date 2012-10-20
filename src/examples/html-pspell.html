@@ -28,14 +28,11 @@
 
       // Init the html spellchecker
       var spellchecker = new $.SpellChecker('#text-content', {
+        lang: 'en',
         parser: 'html',
         engine: {
           path: "../engines/php/spellchecker.php",
-          driver: {
-            lang: 'en',
-            type: 'PSpell',
-            dictionary: ''
-          }
+          driver: 'PSpell'
         },
         suggestBox: {
           position: 'below'
