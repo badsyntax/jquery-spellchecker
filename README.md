@@ -1,19 +1,29 @@
 # jQuery Spellchecker
 
-A jQuery Spellchecker plugin, by Richard Willis
+A jQuery Spellchecker plugin. This is a complete rewrite of the [initial spellchecker](http://code.google.com/p/jquery-spellchecker/) plugin I wrote, 
+making it easier to integrate, easier to create new engines, and easier to use!
+
+I use the excellent [findAndReplaceDOMText](https://github.com/padolsey/findAndReplaceDOMText) library for HTML parsing,
+enabling the plugin to do better find and replace actions, even with string matches that span across element nodes. 
+This makes it perfect to use in any WYSIWYG editor.
+
+## Download
+
+* [View Downloads](https://github.com/badsyntax/jquery-spellchecker/downloads)
 
 ## Documentation
-https://github.com/badsyntax/jquery-spellchecker/wiki/Documentation
+
+* [Installation and usage](https://github.com/badsyntax/jquery-spellchecker/wiki/Documentation)
 
 ## Examples
-* http://jquery-spellchecker.badsyntax.co/html.html
-* http://jquery-spellchecker.badsyntax.co/textarea.html
-* http://jquery-spellchecker.badsyntax.co/languages.html
-* http://jquery-spellchecker.badsyntax.co/drivers.html
+* [Spellcheck some HTML](http://jquery-spellchecker.badsyntax.co/html.html)
+* [Spellcheck the value of a textarea](http://jquery-spellchecker.badsyntax.co/textarea.html)
+* [Different languages](http://jquery-spellchecker.badsyntax.co/languages.html)
+* [Different drivers](http://jquery-spellchecker.badsyntax.co/drivers.html)
 
 ## Issues
 
-Please post any issue you find in the issue tracker https://github.com/badsyntax/jquery-spellchecker/issues. I gladly accept pull requests too!
+Please post any issue you find in the [issue tracker](https://github.com/badsyntax/jquery-spellchecker/issues). I gladly accept pull requests too!
 
 ## License
 
