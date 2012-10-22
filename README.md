@@ -25,6 +25,10 @@ This makes it perfect to use in any WYSIWYG editor.
 
 Please post any issue you find in the [issue tracker](https://github.com/badsyntax/jquery-spellchecker/issues). I gladly accept pull requests too!
 
+## Contributing
+
+* View the [contribute documentation](https://github.com/badsyntax/jquery-spellchecker/blob/master/CONTRIBUTING.md) to learn how to contribute to the project.
+
 ## License
 
 Licensed under the MIT license.
