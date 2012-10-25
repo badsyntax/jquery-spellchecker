@@ -17,11 +17,11 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
 
   public function get_suggestions()
   {
-    $word = urldecode($_POST['word']);
-
-    $suggestions = array();
+    $word = $_POST['word'];
 
     $matches = $this->get_matches($word);
+
+    $suggestions = array();
 
     if (isset($matches[0][3]) AND trim($matches[0][3]) !== '')
     {
@@ -33,17 +33,15 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
 
   public function get_incorrect_words()
   {
-    $text = urldecode($_POST['text']);
+    $text = $_POST['text'];
 
     $words = $this->get_matches($text);
 
     $incorrect_words = array();
 
-    $text = utf8_decode($text);
-
     foreach($words as $word)
     {
-      $incorrect_words[] = utf8_encode(substr($text, $word[0], $word[1]));
+      $incorrect_words[] = mb_substr($text, $word[0], $word[1], 'utf-8');
     }
 
     $this->send_data('success', $incorrect_words);

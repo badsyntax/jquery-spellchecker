@@ -13,8 +13,9 @@
 </head>
 <body>
     <p>This example demonstrates how the <em>html parser</em> can be used to check the spelling of text within a DOM tree.</p>
+
     <div id="text-content">
-      Here is a badw<strong>o<em>rd</em></strong>d. It has beeen incorrectly spelt.
+      Вот это пл<strong>оoх</strong>ое слово. Она былiа написана с ошибками.
     </div>
     <button id="check-textarea">
       Check Spelling
@@ -27,7 +28,7 @@
 
       // Init the html spellchecker
       var spellchecker = new $.SpellChecker('#text-content', {
-        lang: 'en',
+        lang: 'ru',
         parser: 'html',
         webservice: {
           path: '../../webservices/php/spellchecker.php',
