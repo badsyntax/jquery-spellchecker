@@ -6,7 +6,7 @@
   <title>jQuery Spell Checker example</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width">
-  <link rel="stylesheet" type="text/css" media="screen" href="../css/jquery.spellchecker.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="../../css/jquery.spellchecker.css" />
 </head>
 <body>
     <p>This example demonstrates how the <em>text parser</em> can be used to check the spelling of text in a form field.</p>
@@ -23,8 +23,8 @@
       Check Spelling
     </button>&nbsp;
   </div>
-  <script type="text/javascript" src="../js/libs/jquery/jquery-1.8.2.min.js"></script>
-  <script type="text/javascript" src="../js/jquery.spellchecker.js"></script>
+  <script type="text/javascript" src="../../js/libs/jquery/jquery-1.8.2.min.js"></script>
+  <script type="text/javascript" src="../../js/jquery.spellchecker.js"></script>
   <script type="text/javascript">
 
     (function() {
@@ -33,13 +33,11 @@
       
       // Init the text spellchecker
       var spellchecker = new $.SpellChecker(element, {
+        lang: 'en',
         parser: 'text',
-        engine: {
-          path: "../engines/php/spellchecker.php",
-          driver: {
-            lang: 'en',
-            type: 'google'
-          }
+        webservice: {
+          path: '../../webservices/php/spellchecker.php',
+          driver: 'google'
         },
         suggestBox: {
           position: 'above'
