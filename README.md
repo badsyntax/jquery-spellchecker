@@ -7,6 +7,8 @@ I use the excellent [findAndReplaceDOMText](https://github.com/padolsey/findAndR
 enabling the plugin to do better find and replace actions, even with string matches that span across element nodes. 
 This makes it perfect to use in any WYSIWYG editor.
 
+**Please Note** - This is an alpha release while I continue to add new features and fix bugs. I don't suggest using this code in any production environment, yet.
+
 ## Download
 
 * [View Downloads](https://github.com/badsyntax/jquery-spellchecker/downloads)
@@ -24,6 +26,10 @@ This makes it perfect to use in any WYSIWYG editor.
 ## Issues
 
 Please post any issue you find in the [issue tracker](https://github.com/badsyntax/jquery-spellchecker/issues). I gladly accept pull requests too!
+
+## Contributing
+
+* View the [contribute documentation](https://github.com/badsyntax/jquery-spellchecker/blob/master/CONTRIBUTING.md) to learn how to contribute to the project.
 
 ## License
 
