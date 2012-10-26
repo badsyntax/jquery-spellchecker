@@ -19,8 +19,9 @@ class SpellChecker {
 			exit;
 		}
 
-		$driver = $_POST['driver'];
-		$action = $_POST['action'];
+		$lang = $_POST['driver']['lang'];
+		$driver = $_POST['driver']['type'];
+		$action = $_POST['action'];		
 
 		if (!$driver)
 		{
@@ -36,14 +37,16 @@ class SpellChecker {
 		$this->execute_action($action);
 	}
 
-	public function load_driver($driver = NULL)
+	public function load_driver($driver = NULL, $lang = 'en')
 	{
+
 		require_once 'spellchecker/driver.php';
 		require_once 'spellchecker/driver/'.strtolower($driver).'.php';
 
 		$config = array(
-			'lang' => $_POST['lang']
+			'lang' => $lang
 		);
+		
 		$driver = 'Spellchecker_Driver_'.ucfirst($driver);
 
 		$this->driver = new $driver($config);
