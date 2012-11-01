@@ -3,7 +3,7 @@
 module.exports = function(grunt) {
 
   grunt.initConfig({
-    pkg: '<json:spellchecker.jquery.json>',
+    pkg: '<json:jquery.spellchecker.json>',
     meta: {
       banner: '/*\n * <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
         '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
