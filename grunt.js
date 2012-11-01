@@ -21,9 +21,9 @@ module.exports = function(grunt) {
     copy: {
       dist: {
         files: {
-          "dist/examples/": "src/examples/*",
+          "dist/examples/": "src/examples/**",
           "dist/css/": "src/css/*",
-          "dist/engines/php/": "src/engines/php/**",
+          "dist/webservices/php/": "src/webservices/php/**",
           "dist/js/libs/jquery/": "src/js/libs/jquery/jquery-1.8.2.min.js"
         }
       }
@@ -59,7 +59,7 @@ module.exports = function(grunt) {
     },
     jshint: {
       options: {
-        curly: true,
+        curly: false,
         eqeqeq: true,
         immed: true,
         latedef: true,

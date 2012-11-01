@@ -99,7 +99,6 @@ describe("SpellChecker", function() {
     it('Replaces a Unicode word multiple times in a string of text', function() {
       var text = 'Привет, ты в порядке? Хотели бы Вы немного кокса? Нет, спасибо, я в порядке!';
       var replaced = parser.replaceWordInText(text, 'порядке', 'хорошо');
-      console.log(replaced);
       expect(replaced).toBe('Привет, ты в хорошо? Хотели бы Вы немного кокса? Нет, спасибо, я в хорошо!');
     });
   });  
