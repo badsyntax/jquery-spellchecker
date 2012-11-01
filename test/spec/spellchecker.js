@@ -1,49 +1,59 @@
-/*global describe:false, expect:false, $:false, it:false*/
+/*global describe:false, expect:false, $:false, it:false, spyOn:false*/
 
 describe("SpellChecker", function() {
- 
+
   describe('Dependancies', function() {
     it('Has jQuery', function() {
       expect(window.jQuery).not.toBe('undefined');
     });
   });
 
-    var spellchecker = new $.SpellChecker;
-
-    // console.log(spellchecker);
-
   describe('Plugin setup', function() {
-    
     it('Has a prototype object stored on the jQuery namespace', function() {
       expect(typeof $.SpellChecker).toBe('function');
     });
-    
-    it('Extends the events util', function(){
-      expect(typeof (new $.SpellChecker).on).toBe('function');
+  });
+
+  describe('Plugin destroy', function() {
+
+    it('Destroys the suggestBox and incorrectWords box elements', function(){
+      var a = $('<a id="test1" />').appendTo('body');
+      var spellchecker = new $.SpellChecker(a);
+      spellchecker.destroy();
+      expect($('.spellchecker-suggestbox').length).toBe(0);
+      expect($('.spellchecker-incorrectwords').length).toBe(0);
+      a.remove();
     });
   });
 
   describe('Plugin construction', function() {
 
+    var spellchecker, a, parser;
+
+    beforeEach(function () {
+      a = $('<a id="test1" />').appendTo('body');
+      spellchecker = new $.SpellChecker(a, {
+        parser: 'text'
+      });
+      parser = spellchecker.parser;
+    });
+
+    afterEach(function() {
+      spellchecker.destroy();
+      a.remove();
+    });
+
     it('Sets an element propery as a jQuery instance', function() {
-      var a = $('<a id="test1" />').appendTo('body');
-      var spellchecker = new $.SpellChecker('#test1');
       expect(spellchecker.element.jquery).not.toBe(undefined);
       expect(spellchecker.element.length).toBe(1);
       expect(spellchecker.element[0]).toBe(a[0]);
-      a.remove();
     });
 
     it('Sets the element \'spellcheck\' attribute', function() {
-      var a = $('<a id="test1" />').appendTo('body');
-      var spellchecker = new $.SpellChecker('#test1');
       expect(a.attr('spellcheck')).toBe('false');
-      a.remove();
     });
 
     it('Creates instances of suggestBox and incorrectWords objects', function() {
-      var a = $('<a id="test1" />').appendTo('body');
-      var spellchecker = new $.SpellChecker('#test1');
       expect(typeof spellchecker.suggestBox).toBe('object');
       expect(typeof spellchecker.incorrectWords).toBe('object');
     });
@@ -52,26 +62,49 @@ describe("SpellChecker", function() {
   describe('Config', function() {
 
     it('Sets config on construction', function() {
-      var spellchecker = new $.SpellChecker(null, {
+      var a = $('<a id="test1" />').appendTo('body');
+      var spellchecker = new $.SpellChecker(a, {
         testProp: true
       });
       expect(spellchecker.config.testProp).toBe(true);
+      spellchecker.destroy();
+      a.remove();
     });
 
     it('Does a deep merge of config values', function() {
-      var spellchecker = new $.SpellChecker(null, {
+      var a = $('<a id="test1" />').appendTo('body');
+      var spellchecker = new $.SpellChecker(a, {
         incorrectWords: {
           newProp: true
         }
       });
       expect(spellchecker.config.incorrectWords.newProp).toBe(true);
       expect(spellchecker.config.incorrectWords.container).not.toBe(undefined);
+      spellchecker.destroy();
+      a.remove();
     });
   });
 
   describe('Events', function() {
-    
-    var spellchecker = new $.SpellChecker;
+
+    var spellchecker, a, parser;
+
+    beforeEach(function () {
+      a = $('<a id="test1" />').appendTo('body');
+      spellchecker = new $.SpellChecker(a, {
+        parser: 'text'
+      });
+      parser = spellchecker.parser;
+    });
+
+    afterEach(function() {
+      spellchecker.destroy();
+      a.remove();
+    });
+
+    it('Extends the events util', function(){
+      expect(typeof spellchecker.on).toBe('function');
+    });
 
     it('Creates a handlers object to store the handlers on construction', function() {
       expect(typeof spellchecker._handlers).toBe('object');
@@ -104,24 +137,64 @@ describe("SpellChecker", function() {
       var events = { handler: function() {} };
       spyOn(events, 'handler');
       spellchecker.on('test2', events.handler);
-      var t = $('<a />');
-      t.on('click', spellchecker.handler('test2'));
-      t.trigger('click');
+      var a = $('<a />');
+      a.on('click', spellchecker.handler('test2'));
+      a.trigger('click');
       expect(events.handler).toHaveBeenCalled();
     });
+
   });
 
   describe('Suggest box', function() {
+    
+    var spellchecker, a, parser;
 
+    beforeEach(function () {
+      a = $('<a id="test1" />').appendTo('body');
+      spellchecker = new $.SpellChecker(a, {
+        parser: 'text'
+      });
+      parser = spellchecker.parser;
+    });
+
+    afterEach(function() {
+      spellchecker.destroy();
+      a.remove();
+    });
+
+    it('Creates the suggest box container element and appends it to the body', function() {
+      expect($('.spellchecker-suggestbox').length).toBe(1);
+    });
+
+    it('Adds words to the box', function() {
+      var words = [
+        'word1',
+        'word2',
+        'word3'
+      ]; 
+      spellchecker.suggestBox.addWords(words);
+      var children = spellchecker.suggestBox.container.find('.words').children();
+      expect(children.length).toBe(3);
+      expect(children.eq(0).text()).toBe('word1');
+    });
   });
 
   describe('Text parser', function() {
 
-    var spellchecker = new $.SpellChecker(null, {
-      parser: 'text'
+    var spellchecker, a, parser;
+
+    beforeEach(function () {
+      a = $('<a id="test1" />').appendTo('body');
+      spellchecker = new $.SpellChecker(a, {
+        parser: 'text'
+      });
+      parser = spellchecker.parser;
     });
 
-    var parser = spellchecker.parser;
+    afterEach(function() {
+      spellchecker.destroy();
+      a.remove();
+    });
 
     it('Removes punctuation from text', function() {
 
@@ -208,5 +281,6 @@ describe("SpellChecker", function() {
       var replaced = parser.replaceWordInText(text, 'порядке', 'хорошо');
       expect(replaced).toBe('Привет, ты в хорошо? Хотели бы Вы немного кокса? Нет, спасибо, я в хорошо!');
     });
+
   });  
 });
