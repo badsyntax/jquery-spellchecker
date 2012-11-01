@@ -530,7 +530,7 @@
     };
   };
 
-  HtmlParser.prototype.ignoreWord = function() {
+  HtmlParser.prototype.ignoreWord = function(oldWord, replacement) {
     this.replaceWord(oldWord, replacement);
   };
 
@@ -578,7 +578,7 @@
   SpellChecker.prototype.bindEvents = function() {
     this.on('check.fail', this.onCheckFail.bind(this));
     this.suggestBox.on('ignore.word', this.onIgnoreWord.bind(this));
-    this.suggestBox.on('select.word', this.onSuggestedWordSelect.bind(this));
+    this.suggestBox.on('select.word', this.onSelectWord.bind(this));
     this.incorrectWords.on('select.word', this.onIncorrectWordSelect.bind(this));
   };
 
@@ -593,6 +593,14 @@
   SpellChecker.prototype.showSuggestedWords = function(word, element) {
     var getWords = this.webservice.getSuggestedWords.bind(this.webservice);
     this.suggestBox.loadSuggestedWords(getWords, word, element);
+  };
+
+  SpellChecker.prototype.replaceWord = function(oldWord, replacement) {
+    this.suggestBox.close();
+    this.suggestBox.detach();
+    this.parser.replaceWord(oldWord, replacement);
+    this.suggestBox.reattach();
+    this.incorrectWords.removeWord(this.incorrectWordElement);
   };
 
   /* Event handlers */
@@ -613,18 +621,14 @@
     this.suggestBox.reattach();
   };
 
-  SpellChecker.prototype.onSuggestedWordSelect = function(e, word, element) {
+  SpellChecker.prototype.onSelectWord = function(e, word, element) {
     e.preventDefault();
-    this.suggestBox.close();
-    this.suggestBox.detach();
-    this.parser.replaceWord(this.incorrectWord, word);
-    this.suggestBox.reattach();
-    this.incorrectWords.removeWord(this.incorrectWordElement);
+    this.replaceWord(this.incorrectWord, word);
   };
 
-  SpellChecker.prototype.onIgnoreWord = function() {
-    console.log(arguments);
-    this.parser.ignoreWord();
+  SpellChecker.prototype.onIgnoreWord = function(e, word, element) {
+    e.preventDefault();
+    this.replaceWord(this.incorrectWord, this.incorrectWord);
   };
 
   SpellChecker.prototype.onIncorrectWordSelect = function(e, word, element) {
