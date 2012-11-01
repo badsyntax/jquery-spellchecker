@@ -414,7 +414,8 @@
   };
 
   TextParser.prototype.replaceWordInText = function(text, oldWord, newWord) {
-    return text.replace(new RegExp('(^|[^' + letterChars + '])(' + oldWord + ')', 'g'), '$1' + newWord);
+    var regex = new RegExp('(^|[^' + letterChars + '])(' + oldWord + ')(?=[^' + letterChars + ']|$)', 'g');
+    return text.replace(regex, '$1' + newWord);
   };
 
   TextParser.prototype.replaceWord = function(oldWord, replacement) {
@@ -444,20 +445,33 @@
   };
 
   HtmlParser.prototype.replaceText = function(regExp, replaceText, captureGroup) {
-    window.findAndReplaceDOMText(regExp, this.element[0] ,replaceText, captureGroup);
+    window.findAndReplaceDOMText(regExp, this.element[0], replaceText, captureGroup);
   };
 
   HtmlParser.prototype.replaceWord = function(oldWord, replacement) {
 
     window.findAndReplaceDOMText.revert();
 
+    var regExp = new RegExp('(^|[^' + letterChars + '])(' + oldWord + ')(?=[^' + letterChars + ']|$)', 'g');
+
+    this.replaceText(regExp, this.replaceTextHandler(replacement), 2);
+
+    // Remove this word from the list of incorrect words
+    this.incorrectWords = $.map(this.incorrectWords, function(word) {
+      return word === oldWord ? null : word;
+    });
+
+    this.highlightWords(this.incorrectWords);
+  };
+
+  HtmlParser.prototype.replaceTextHandler = function(replacement){
+
     var r = replacement;
     var replaced;
     var replaceFill;
     var c;
-    var regExp = new RegExp('(^|[^' + letterChars + '])(' + oldWord + ')(?=[^' + letterChars + ']|$)', 'g');
 
-    this.replaceText(regExp, function(fill, i){
+    return function(fill, i) {
 
       // Reset the replacement for each match
       if (i !== c) {
@@ -476,14 +490,7 @@
       }
 
       return document.createTextNode(replaceFill);
-    }, 2);
-
-    // Remove this word from the list of incorrect words
-    this.incorrectWords = $.map(this.incorrectWords, function(word) {
-      return word === oldWord ? null : word;
-    });
-
-    this.highlightWords(this.incorrectWords);
+    };
   };
 
   HtmlParser.prototype.highlightWords = function(incorrectWords) {
@@ -491,15 +498,19 @@
     if (!incorrectWords.length) {
       return;
     }
-
     this.incorrectWords = incorrectWords;
 
     var regExp = new RegExp('(^|[^' + letterChars + '])(' + incorrectWords.join('|') + ')(?=[^' + letterChars + ']|$)', 'g');
+
+    this.replaceText(regExp, this.highlightWordsHandler(), 2);
+  };
+
+  HtmlParser.prototype.highlightWordsHandler = function() {
+
     var c;
     var replaceElement;
 
-    this.replaceText(regExp, function(fill, i) {
-
+    return function(fill, i) {
       // Replacement node
       var span = $('<span />', {
         'class': pluginName + '-word-highlight'
@@ -519,7 +530,7 @@
       });
 
       return span[0];
-    }, 2);
+    };
   };
 
   /* Spellchecker
