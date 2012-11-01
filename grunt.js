@@ -54,6 +54,13 @@ module.exports = function(grunt) {
     // qunit: {
     //   files: ['test/**/*.html']
     // },
+    jasmine : {
+      src : [
+        'src/js/libs/jquery/jquery-1.8.2.min.js',
+        'src/js/jquery.spellchecker.js'
+      ],
+      specs : 'test/spec/**/*.js'
+    },
     lint: {
       files: ['grunt.js', 'src/js/jquery.spellchecker.js', 'test/**/*.js']
     },
@@ -83,9 +90,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-mincss');
   grunt.loadNpmTasks('grunt-contrib-compress');
+  grunt.loadNpmTasks('grunt-jasmine-runner');
 
 
   // Default task.
-  grunt.registerTask('default', 'lint concat min mincss copy compress');
+  grunt.registerTask('default', 'lint jasmine concat min mincss copy compress');
 
 };
