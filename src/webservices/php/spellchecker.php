@@ -14,50 +14,56 @@ class SpellChecker {
 
 	public function __construct()
 	{
-		if (!$_POST)
-		{
-			exit;
-		}
-
 		$driver = $_POST['driver'];
 		$action = $_POST['action'];
+		$lang = $_POST['lang'];
 
 		if (!$driver)
 		{
-			exit('Driver not found');
+			exit('Driver not found in request');
 		}
-
 		if (!$action)
 		{
-			exit('Action not found');
+			exit('Action not found in request');
+		}
+		if (!$lang)
+		{
+			exit('Lang not found in request');
 		}
 
-		$this->load_driver($driver);
+		$this->load_driver($driver, $lang);
 		$this->execute_action($action);
 	}
 
-	public function load_driver($driver = NULL)
+	public function load_driver($driver = NULL, $lang = NULL)
 	{
-		require_once 'spellchecker/driver.php';
-		require_once 'spellchecker/driver/'.strtolower($driver).'.php';
+		$base_driver_path = 'spellchecker/driver.php';
+		$driver_path = 'spellchecker/driver/'.strtolower($driver).'.php';
 
-		$config = array(
-			'lang' => $_POST['lang']
-		);
-		$driver = 'Spellchecker_Driver_'.ucfirst($driver);
+		if (!file_exists($driver_path))
+		{
+			exit('Driver does not exist on file system');
+		}
 
-		$this->driver = new $driver($config);
+		require_once $base_driver_path;
+		require_once $driver_path;
+
+		$driver_class = 'Spellchecker_Driver_'.ucfirst($driver);
+
+		$this->driver = new $driver_class(array(
+			'lang' => $lang
+		));
 	}
 
 	public function execute_action($action = NULL)
 	{
 		if (!method_exists($this->driver, $action))
 		{
-			die('Action does not exist');
+			exit('Action does not exist on driver');
 		}
 
 		$this->driver->{$action}();
 	}
 }
 
-new SpellChecker();
+$_POST AND new SpellChecker();
