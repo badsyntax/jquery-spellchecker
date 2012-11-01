@@ -58,7 +58,8 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
     $body .= '<spellrequest textalreadyclipped="0" ignoredups="0" ignoredigits="1" ignoreallcaps="1">';
     $body .= '<text>'.$text.'</text></spellrequest>';
 
-    if (!function_exists('curl_init')) {
+    if (!function_exists('curl_init'))
+    {
       exit('Curl is not available');
     }
 
