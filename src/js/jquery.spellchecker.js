@@ -154,6 +154,10 @@
     elem.remove();
   };
 
+  IncorrectWordsBox.prototype.destroy = function() {
+    this.container.empty().remove();
+  };
+
   /* Incorrect words inline
    *************************/
 
@@ -178,6 +182,10 @@
   IncorrectWordsInline.prototype.loading = function() {};
 
   IncorrectWordsInline.prototype.removeWord = function(elem) {};
+
+  IncorrectWordsInline.prototype.destroy = function() {
+    window.findAndReplaceDOMText.revert();
+  };
 
   /* Suggest box
    *************************/
@@ -318,6 +326,10 @@
 
   SuggestBox.prototype.onWindowClick = function(e) {
     this.close();
+  };
+
+  SuggestBox.prototype.destroy = function() {
+    this.container.empty().remove();
   };
 
   /* Spellchecker web service
@@ -546,12 +558,9 @@
 
     this.setupWebService();
     this.setupParser();
-
-    if (this.element[0]) {
-      this.setupSuggestBox();
-      this.setupIncorrectWords();
-      this.bindEvents();
-    }
+    this.setupSuggestBox();
+    this.setupIncorrectWords();
+    this.bindEvents();
   };
   inherits(SpellChecker, Events);
 
@@ -601,6 +610,11 @@
     this.parser.replaceWord(oldWord, replacement);
     this.suggestBox.reattach();
     this.incorrectWords.removeWord(this.incorrectWordElement);
+  };
+
+  SpellChecker.prototype.destroy = function() {
+    this.suggestBox.destroy();
+    this.incorrectWords.destroy();
   };
 
   /* Event handlers */
