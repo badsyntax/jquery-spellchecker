@@ -1,8 +1,7 @@
 /*global module:false*/
+
 module.exports = function(grunt) {
 
-
-  // Project configuration.
   grunt.initConfig({
     pkg: '<json:spellchecker.jquery.json>',
     meta: {
@@ -42,7 +41,6 @@ module.exports = function(grunt) {
         }
       }
     },
-
     compress: {
       zip: {
         files: {
@@ -50,10 +48,6 @@ module.exports = function(grunt) {
         }
       }
     },
-
-    // qunit: {
-    //   files: ['test/**/*.html']
-    // },
     jasmine : {
       src : [
         'src/js/libs/jquery/jquery-1.8.2.min.js',
@@ -92,8 +86,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-compress');
   grunt.loadNpmTasks('grunt-jasmine-runner');
 
-
-  // Default task.
   grunt.registerTask('default', 'lint jasmine concat min mincss copy compress');
-
 };
