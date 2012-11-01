@@ -1,17 +1,118 @@
 /*global describe:false, expect:false, $:false, it:false*/
 
-describe('Dependancies', function() {
-  it('Has jQuery', function() {
-    expect(window.jQuery).not.toBe('undefined');
-  });
-});
-
 describe("SpellChecker", function() {
  
+  describe('Dependancies', function() {
+    it('Has jQuery', function() {
+      expect(window.jQuery).not.toBe('undefined');
+    });
+  });
+
+    var spellchecker = new $.SpellChecker;
+
+    // console.log(spellchecker);
+
   describe('Plugin setup', function() {
+    
     it('Has a prototype object stored on the jQuery namespace', function() {
       expect(typeof $.SpellChecker).toBe('function');
     });
+    
+    it('Extends the events util', function(){
+      expect(typeof (new $.SpellChecker).on).toBe('function');
+    });
+  });
+
+  describe('Plugin construction', function() {
+
+    it('Sets an element propery as a jQuery instance', function() {
+      var a = $('<a id="test1" />').appendTo('body');
+      var spellchecker = new $.SpellChecker('#test1');
+      expect(spellchecker.element.jquery).not.toBe(undefined);
+      expect(spellchecker.element.length).toBe(1);
+      expect(spellchecker.element[0]).toBe(a[0]);
+      a.remove();
+    });
+
+    it('Sets the element \'spellcheck\' attribute', function() {
+      var a = $('<a id="test1" />').appendTo('body');
+      var spellchecker = new $.SpellChecker('#test1');
+      expect(a.attr('spellcheck')).toBe('false');
+      a.remove();
+    });
+
+    it('Creates instances of suggestBox and incorrectWords objects', function() {
+      var a = $('<a id="test1" />').appendTo('body');
+      var spellchecker = new $.SpellChecker('#test1');
+      expect(typeof spellchecker.suggestBox).toBe('object');
+      expect(typeof spellchecker.incorrectWords).toBe('object');
+    });
+  });
+
+  describe('Config', function() {
+
+    it('Sets config on construction', function() {
+      var spellchecker = new $.SpellChecker(null, {
+        testProp: true
+      });
+      expect(spellchecker.config.testProp).toBe(true);
+    });
+
+    it('Does a deep merge of config values', function() {
+      var spellchecker = new $.SpellChecker(null, {
+        incorrectWords: {
+          newProp: true
+        }
+      });
+      expect(spellchecker.config.incorrectWords.newProp).toBe(true);
+      expect(spellchecker.config.incorrectWords.container).not.toBe(undefined);
+    });
+  });
+
+  describe('Events', function() {
+    
+    var spellchecker = new $.SpellChecker;
+
+    it('Creates a handlers object to store the handlers on construction', function() {
+      expect(typeof spellchecker._handlers).toBe('object');
+    });
+
+    it('Assigns a new jQuery callbacks list object to the list of handlers', function() {
+      spellchecker.on('test', function(){});
+      expect(typeof spellchecker._handlers.test).toBe('object');
+      expect(typeof spellchecker._handlers.test.add).toBe('function');
+    });
+
+    it('Executes the handler when triggering an event', function() {
+      var events = { handler: function() {} };
+      spyOn(events, 'handler');
+      spellchecker.on('test', events.handler);
+      spellchecker.trigger('test');
+      expect(events.handler).toHaveBeenCalled();
+    });
+
+    it('Executes the handler with custom event data', function() {
+      var events = { handler: function() {} };
+      var data = { prop: true };
+      spyOn(events, 'handler');
+      spellchecker.on('test', events.handler);
+      spellchecker.trigger('test', data);
+      expect(events.handler).toHaveBeenCalledWith(data);
+    });
+
+    it('Routes DOM events to custom events', function() {
+      var events = { handler: function() {} };
+      spyOn(events, 'handler');
+      spellchecker.on('test2', events.handler);
+      var t = $('<a />');
+      t.on('click', spellchecker.handler('test2'));
+      t.trigger('click');
+      expect(events.handler).toHaveBeenCalled();
+    });
+  });
+
+  describe('Suggest box', function() {
+
   });
 
   describe('Text parser', function() {
