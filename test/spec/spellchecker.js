@@ -1,5 +1,11 @@
 /*global describe:false, expect:false, $:false, it:false*/
 
+describe('Dependancies', function() {
+  it('Has jQuery', function() {
+    expect(window.jQuery).not.toBe('undefined');
+  });
+});
+
 describe("SpellChecker", function() {
  
   describe('Plugin setup', function() {
