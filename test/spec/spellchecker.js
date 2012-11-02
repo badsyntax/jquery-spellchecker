@@ -1,4 +1,4 @@
-/*global describe:false, expect:false, $:false, it:false, spyOn:false*/
+/*global describe:false, expect:false, $:false, it:false, spyOn:false, beforeEach:false, afterEach:false*/
 
 describe("SpellChecker", function() {
 
