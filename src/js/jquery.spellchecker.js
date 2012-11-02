@@ -51,6 +51,10 @@
     _sub.prototype.constructor = _sub;
   };
 
+  RegExp.escape = function(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+  };
+
   /* Character sets
    *************************/
 
@@ -426,7 +430,7 @@
   };
 
   TextParser.prototype.replaceWordInText = function(text, oldWord, newWord) {
-    var regex = new RegExp('(^|[^' + letterChars + '])(' + oldWord + ')(?=[^' + letterChars + ']|$)', 'g');
+    var regex = new RegExp('(^|[^' + letterChars + '])(' + RegExp.escape(oldWord) + ')(?=[^' + letterChars + ']|$)', 'g');
     return text.replace(regex, '$1' + newWord);
   };
 
@@ -464,7 +468,7 @@
 
     window.findAndReplaceDOMText.revert();
 
-    var regExp = new RegExp('(^|[^' + letterChars + '])(' + oldWord + ')(?=[^' + letterChars + ']|$)', 'g');
+    var regExp = new RegExp('(^|[^' + letterChars + '])(' + RegExp.escape(oldWord) + ')(?=[^' + letterChars + ']|$)', 'g');
 
     this.replaceText(regExp, this.replaceTextHandler(oldWord, replacement), 2);
 
