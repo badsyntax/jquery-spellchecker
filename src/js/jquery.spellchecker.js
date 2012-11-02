@@ -129,7 +129,7 @@
     this.container = $([
       '<div class="' + pluginName + '-incorrectwords">',
       '</div>'
-    ].join('')).appendTo(this.config.incorrectWords.container);
+    ].join('')).hide().appendTo(this.config.incorrectWords.container);
   };
 
   IncorrectWordsBox.prototype.addWords = function(words) {
@@ -152,6 +152,9 @@
 
   IncorrectWordsBox.prototype.removeWord = function(elem) {
     elem.remove();
+    if (this.container.children().length === 0) {
+      this.container.hide();
+    }
   };
 
   IncorrectWordsBox.prototype.destroy = function() {
