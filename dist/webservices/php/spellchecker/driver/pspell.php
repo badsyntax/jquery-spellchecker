@@ -26,7 +26,7 @@ class SpellChecker_Driver_PSpell extends Spellchecker_Driver
 
   public function get_suggestions()
   {
-    $word = urldecode($_POST['word']);
+    $word = $_POST['word'];
 
     $suggestions = pspell_suggest($this->pspell_link, $word);
 
@@ -35,7 +35,7 @@ class SpellChecker_Driver_PSpell extends Spellchecker_Driver
 
   public function get_incorrect_words()
   {
-    $text = urldecode($_POST['text']);
+    $text = $_POST['text'];
 
     $words = explode(' ', $text);
 
