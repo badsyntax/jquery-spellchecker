@@ -53,7 +53,7 @@
   };
 
   RegExp.escape = function(text) {
-    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+    return text.replace(/[\-\[\]{}()*+?.,\^$|#\s]/g, "\\$&");
   };
 
   /* Character sets
@@ -105,6 +105,35 @@
       this.trigger(handlerName, e, word, element, this);
 
     }.bind(this);
+  };  
+  
+  /* Collections 
+   *************************/
+
+  var Collection = function(elements, instanceFactory) {
+    this.instances = [];
+    for(var i = 0; i < elements.length; i++) {
+      this.instances.push( instanceFactory(elements[i]) );
+    }
+    this.methods([ 'on', 'destroy', 'trigger' ]);
+  };
+
+  Collection.prototype.methods = function(methods) {
+    $.each(methods, function(i, method) {
+      this[method] = function() {
+        this.execute(method, arguments);
+      }.bind(this);
+    }.bind(this));
+  };
+
+  Collection.prototype.execute = function(method, args) {
+    $.each(this.instances, function(i, instance) {
+      instance[method].apply(instance, args);
+    });
+  };
+
+  Collection.prototype.get = function(i) {
+    return this.instances[i];
   };
 
   /* Base box
@@ -163,7 +192,9 @@
   };
 
   IncorrectWordsBox.prototype.removeWord = function(elem) {
-    (elem) && elem.remove();
+    if (elem) {
+      elem.remove();
+    }
     if (this.container.children().length === 0) {
       this.container.hide();
     }
@@ -446,7 +477,7 @@
 
   TextParser.prototype.replaceWord = function(oldWord, replacement, element) {
     if (!element) {
-      throw 'Element to replace text not specified'
+      throw 'Element to replace text not specified';
     }
     element = $(element);
     var newText = this.replaceWordInText(element.val(), oldWord, replacement);
@@ -465,15 +496,14 @@
 
     return $.map(this.elements, function(element) {
 
-      var element = $(element)
+      element = $(element)
         .clone()
         .find('[class^="spellchecker-"]')
         .remove()
         .end();
 
-      var text = element.text();
+      return this.clean(element.text());
 
-      return this.clean(text);
     }.bind(this));
   };
 
@@ -572,32 +602,6 @@
     this.replaceWord(oldWord, replacement);
   };
 
-  var Collection = function(elements, instanceFactory) {
-    this.instances = [];
-    for(var i = 0; i < elements.length; i++) {
-      this.instances.push( instanceFactory(elements[i]) );
-    }
-    this.methods([ 'on', 'destroy', 'trigger' ]);
-  };
-
-  Collection.prototype.methods = function(methods) {
-    $.each(methods, function(i, method) {
-      this[method] = function() {
-        this.execute(method, arguments);
-      }.bind(this);
-    }.bind(this));
-  }
-
-  Collection.prototype.execute = function(method, args) {
-    $.each(this.instances, function(i, instance) {
-      instance[method].apply(instance, args);
-    });
-  };
-
-  Collection.prototype.get = function(i) {
-    return this.instances[i];
-  };
-
   /* Spellchecker
    *************************/
 
@@ -684,7 +688,7 @@
         outcome = 'fail';
         return false;
       }
-    })
+    });
 
     this.trigger('check.' + outcome, badWords);
   };
@@ -695,7 +699,7 @@
       if (words.length) {
         this.incorrectWords.get(i).addWords(words); 
       }
-    }.bind(this))
+    }.bind(this));
     this.suggestBox.reattach();
   };
 
