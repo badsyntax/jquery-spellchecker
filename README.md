@@ -38,7 +38,8 @@ The plugin has been tested and works with the following browsers:
 
 You can find simple usage examples in the downloadable package.
 
-* [View online demos](http://jquery-spellchecker.badsyntax.co)
+* [Online demos](http://jquery-spellchecker.badsyntax.co)
+* [Basic demos](http://jquery-spellchecker.badsyntax.co/basic)
 
 
 ## Issues
