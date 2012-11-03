@@ -669,6 +669,7 @@
     this.parser.replaceWord(oldWord, replacement, element);
     this.suggestBox.reattach();
     this.incorrectWords.get(index).removeWord(this.incorrectWordElement);
+    this.trigger('replaceWord');
   };
 
   SpellChecker.prototype.destroy = function() {
