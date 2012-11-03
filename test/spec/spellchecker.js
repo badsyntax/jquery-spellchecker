@@ -2,6 +2,8 @@
 
 describe("SpellChecker", function() {
 
+  var a;
+
   describe('Dependancies', function() {
     it('Has jQuery', function() {
       expect(window.jQuery).not.toBe('undefined');
@@ -287,7 +289,7 @@ describe("SpellChecker", function() {
     
     it('Replaces a word in a DOM tree', function() {
       a = $('<a id="test1">he<span>llo</span></a>').appendTo('body');
-      spellchecker = new $.SpellChecker(a, {
+      var spellchecker = new $.SpellChecker(a, {
         parser: 'html'
       });
       spellchecker.replaceWord('hello', 'test', a);
@@ -298,7 +300,7 @@ describe("SpellChecker", function() {
 
     it('Replaces a word in a textarea', function() {
       a = $('<textarea>hello</textarea>').appendTo('body');
-      spellchecker = new $.SpellChecker(a, {
+      var spellchecker = new $.SpellChecker(a, {
         parser: 'text'
       });
       spellchecker.replaceWord('hello', 'test', a);
@@ -306,5 +308,5 @@ describe("SpellChecker", function() {
       spellchecker.destroy();
       a.remove();
     });
-  })
+  });
 });
