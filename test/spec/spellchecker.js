@@ -44,9 +44,9 @@ describe("SpellChecker", function() {
     });
 
     it('Sets an element propery as a jQuery instance', function() {
-      expect(spellchecker.element.jquery).not.toBe(undefined);
-      expect(spellchecker.element.length).toBe(1);
-      expect(spellchecker.element[0]).toBe(a[0]);
+      expect(spellchecker.elements.jquery).not.toBe(undefined);
+      expect(spellchecker.elements.length).toBe(1);
+      expect(spellchecker.elements[0]).toBe(a[0]);
     });
 
     it('Sets the element \'spellcheck\' attribute', function() {
@@ -281,6 +281,30 @@ describe("SpellChecker", function() {
       var replaced = parser.replaceWordInText(text, 'порядке', 'хорошо');
       expect(replaced).toBe('Привет, ты в хорошо? Хотели бы Вы немного кокса? Нет, спасибо, я в хорошо!');
     });
-
   });  
+
+  describe('Public methods', function() {
+    
+    it('Replaces a word in a DOM tree', function() {
+      a = $('<a id="test1">he<span>llo</span></a>').appendTo('body');
+      spellchecker = new $.SpellChecker(a, {
+        parser: 'html'
+      });
+      spellchecker.replaceWord('hello', 'test', a);
+      expect(a.text()).toBe('test');
+      spellchecker.destroy();
+      a.remove();
+    });
+
+    it('Replaces a word in a textarea', function() {
+      a = $('<textarea>hello</textarea>').appendTo('body');
+      spellchecker = new $.SpellChecker(a, {
+        parser: 'text'
+      });
+      spellchecker.replaceWord('hello', 'test', a);
+      expect(a.val()).toBe('test');
+      spellchecker.destroy();
+      a.remove();
+    });
+  })
 });
