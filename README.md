@@ -3,7 +3,7 @@
 The jQuery Spellchecker is a Javascript spellchecker in the form of a lightweight jQuery plugin that can be used to check the spelling of text within a form field or within a DOM tree.
 This is a complete rewrite of the [initial spellchecker](http://code.google.com/p/jquery-spellchecker/) plugin I wrote.
 
-The current version of the plugin is v0.2.0 beta.
+The current version of the plugin is v0.2.1 beta.
 
 ## Features
 

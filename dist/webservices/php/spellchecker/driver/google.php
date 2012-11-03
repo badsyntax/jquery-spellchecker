@@ -33,18 +33,26 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
 
   public function get_incorrect_words()
   {
-    $text = $_POST['text'];
+    $texts = (array) $_POST['text'];
 
-    $words = $this->get_matches($text);
+    $response = array();
 
-    $incorrect_words = array();
+    foreach($texts as $text)
+    {    
 
-    foreach($words as $word)
-    {
-      $incorrect_words[] = mb_substr($text, $word[0], $word[1], 'utf-8');
+      $words = $this->get_matches($text);
+
+      $incorrect_words = array();
+
+      foreach($words as $word)
+      {
+        $incorrect_words[] = mb_substr($text, $word[0], $word[1], 'utf-8');
+      }
+
+      $response[] = $incorrect_words;
     }
 
-    $this->send_data('success', $incorrect_words);
+    $this->send_data('success', $response);
   }
 
   public function add_to_dictionary() {}
@@ -55,7 +63,7 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
     $url = 'https://www.google.com/tbproxy/spell?lang='.$this->_config['lang'];
 
     $body = '<?xml version="1.0" encoding="utf-8" ?>';
-    $body .= '<spellrequest textalreadyclipped="0" ignoredups="0" ignoredigits="1" ignoreallcaps="1">';
+    $body .= '<spellrequest textalreadyclipped="0" ignoredups="0" ignoredigits="1" ignoreallcaps="0">';
     $body .= '<text>'.$text.'</text></spellrequest>';
 
     if (!function_exists('curl_init'))

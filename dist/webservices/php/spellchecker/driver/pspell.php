@@ -35,21 +35,28 @@ class SpellChecker_Driver_PSpell extends Spellchecker_Driver
 
   public function get_incorrect_words()
   {
-    $text = $_POST['text'];
+    $texts = (array) $_POST['text'];
 
-    $words = explode(' ', $text);
+    $response = array();
 
-    $incorrect_words = array();
-
-    foreach($words as $word)
+    foreach($texts as $text)
     {
-      if (!pspell_check($this->pspell_link, $word))
+      $words = explode(' ', $text);
+
+      $incorrect_words = array();
+
+      foreach($words as $word)
       {
-        $incorrect_words[] = $word;
+        if (!pspell_check($this->pspell_link, $word))
+        {
+          $incorrect_words[] = $word;
+        }
       }
+
+      $response[] = $incorrect_words;
     }
 
-    $this->send_data('success', $incorrect_words);
+    $this->send_data('success', $response);
   }
 
   public function add_to_dictionary()
