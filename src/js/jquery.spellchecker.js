@@ -573,35 +573,29 @@
   };
 
   var Collection = function(elements, instanceFactory) {
-    var instances = [];
-    elements.each(function() {
-      instances.push( instanceFactory(this) );
+    this.instances = [];
+    for(var i = 0; i < elements.length; i++) {
+      this.instances.push( instanceFactory(elements[i]) );
+    }
+    this.methods([ 'on', 'destroy', 'trigger' ]);
+  };
+
+  Collection.prototype.methods = function(methods) {
+    $.each(methods, function(i, method) {
+      this[method] = function() {
+        this.execute(method, arguments);
+      }.bind(this);
+    }.bind(this));
+  }
+
+  Collection.prototype.execute = function(method, args) {
+    $.each(this.instances, function(i, instance) {
+      instance[method].apply(instance, args);
     });
-    this.instances = instances;
   };
 
   Collection.prototype.get = function(i) {
     return this.instances[i];
-  };
-
-  Collection.prototype.on = function() {
-    var args = arguments;
-    $.each(this.instances, function(i, instance) {
-      instance.on.apply(instance, args);
-    });
-  };
-
-  Collection.prototype.destroy = function() {
-    $.each(this.instances, function(i, instance) {
-      instance.destroy();
-    });
-  };
-
-  Collection.prototype.trigger = function() {
-    var args = arguments;
-    $.each(this.instances, function(i, instance) {
-      instance.trigger.apply(instance, args);
-    });
   };
 
   /* Spellchecker
