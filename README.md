@@ -1,31 +1,49 @@
 # jQuery Spellchecker
 
-A jQuery Spellchecker plugin. This is a complete rewrite of the [initial spellchecker](http://code.google.com/p/jquery-spellchecker/) plugin I wrote, 
-making it easier to integrate, easier to create new engines, and easier to use!
+The jQuery Spellchecker is a Javascript spellchecker in the form of a lightweight jQuery plugin that can be used to check the spelling of text within a form field or within a DOM tree.
+This is a complete rewrite of the [initial spellchecker](http://code.google.com/p/jquery-spellchecker/) plugin I wrote.
 
-I use the excellent [findAndReplaceDOMText](https://github.com/padolsey/findAndReplaceDOMText) library for HTML parsing,
-enabling the plugin to do better find and replace actions, even with string matches that span across element nodes. 
-This makes it perfect to use in any WYSIWYG editor.
+The current version of the plugin is v0.2.0 beta.
 
-**Please Note** - This is an alpha release while I continue to add new features and fix bugs. I don't suggest using this code in any production environment, yet.
+## Features
+
+* Unicode support (works with most languages)
+* HTML parsing (for using the spellchecker within WSYIWYG editors)
+* Text parsing (for using the spellchecker on form fields)
+* Event based
+* Multiple fields
+* MIT licensed (it will always be free)
+* Actively developed
+
+## Browser support
+
+The plugin has been tested and works with the following browsers:
+
+* IE6+ and latest Chrome, Firefox, Safari and Opera
+
+## Requirements
+
+* jQuery
+* A back-end webservice to check the spelling of text. You will need put the plugin on a webserver that supports PHP5 to use the default webservice.
 
 ## Download
 
-* [View Downloads](https://github.com/badsyntax/jquery-spellchecker/downloads)
+* [View Downloads](https://github.com/badsyntax/jquery-spellchecker/downloads) (Please always download the latest version.)
 
 ## Documentation
 
-* [Installation and usage](https://github.com/badsyntax/jquery-spellchecker/wiki/Documentation)
+* [View documentation](https://github.com/badsyntax/jquery-spellchecker/wiki/Documentation)
 
 ## Examples
-* [Spellcheck some HTML](http://jquery-spellchecker.badsyntax.co/html.html)
-* [Spellcheck the value of a textarea](http://jquery-spellchecker.badsyntax.co/textarea.html)
-* [Different languages](http://jquery-spellchecker.badsyntax.co/languages.html)
-* [Different drivers](http://jquery-spellchecker.badsyntax.co/drivers.html)
+
+You can find simple usage examples in the downloadable package.
+
+* [View online demos](http://jquery-spellchecker.badsyntax.co)
+
 
 ## Issues
 
-Please post any issue you find in the [issue tracker](https://github.com/badsyntax/jquery-spellchecker/issues). I gladly accept pull requests too!
+Testing is much appreciated. Please post any issue you find in the [issue tracker](https://github.com/badsyntax/jquery-spellchecker/issues).
 
 ## Contributing
 
