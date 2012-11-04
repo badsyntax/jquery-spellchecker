@@ -316,7 +316,6 @@
     this.footer.hide();
     this.open();
     this.words.html(show ? this.loadingMsg : '');
-    this.position();
   };
 
   SuggestBox.prototype.position = function() {
