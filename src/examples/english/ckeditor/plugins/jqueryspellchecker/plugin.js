@@ -6,42 +6,42 @@
 
 CKEDITOR.plugins.add('jqueryspellchecker', {
 
-	init: function( editor ) {
+  init: function( editor ) {
 
-		var pluginName = 'jqueryspellchecker';
-		
+    var pluginName = 'jqueryspellchecker';
+    
     editor.addCommand( pluginName, CKEDITOR.plugins.jQuerySpellChecker );
 
     editor.ui.addButton('jQuerySpellChecker', {
       label: 'SpellCheck',
       icon: 'spellchecker',
       command: pluginName
-  	});
-	}
+    });
+  }
 });
 
 CKEDITOR.plugins.jQuerySpellChecker = {
-	exec: function( editor ) {
-		this.toggleSpellChecker(editor);
-	},
-	canUndo: false,
-	readOnly: 1,
-	toggleSpellChecker: function(editor) {
+  exec: function( editor ) {
+    this.toggleSpellChecker(editor);
+  },
+  canUndo: false,
+  readOnly: 1,
+  toggleSpellChecker: function(editor) {
 
     this.editor = editor;
 
     if (!this.spellchecker) {
-			editor.setReadOnly(true);
+      editor.setReadOnly(true);
       this.createSpellchecker();
       this.spellchecker.check();
     } else {
-			editor.setReadOnly(false);
+      editor.setReadOnly(false);
       this.spellchecker.destroy();
       this.spellchecker = null;
     }
 
-		editor.commands.jqueryspellchecker.toggleState();
-	},
+    editor.commands.jqueryspellchecker.toggleState();
+  },
   createSpellchecker: function() {
 
     var t = this;
