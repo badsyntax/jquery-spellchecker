@@ -24,53 +24,13 @@ class SpellChecker_Driver_PSpell extends Spellchecker_Driver
     $this->pspell_link = pspell_new($this->_config['lang'], '', '', 'utf-8');
   }
 
-  public function get_suggestions()
+  public function get_word_suggestions($word = NULL)
   {
-    $word = $_POST['word'];
-
-    $suggestions = pspell_suggest($this->pspell_link, $word);
-
-    $this->send_data(NULL, $suggestions);
+    return pspell_suggest($this->pspell_link, $word);
   }
 
-  public function get_incorrect_words()
+  public function check_word($word = NULL)
   {
-    $texts = (array) $_POST['text'];
-
-    $response = array();
-
-    foreach($texts as $text)
-    {
-      $words = explode(' ', $text);
-
-      $incorrect_words = array();
-
-      foreach($words as $word)
-      {
-        if (!pspell_check($this->pspell_link, $word))
-        {
-          $incorrect_words[] = $word;
-        }
-      }
-
-      $response[] = $incorrect_words;
-    }
-
-    $this->send_data('success', $response);
+    return pspell_check($this->pspell_link, $word);
   }
-
-  public function add_to_dictionary()
-  {
-    $pspell_config = pspell_config_create('en');
-
-    pspell_config_personal($pspell_config, $this->pspell_personal_dictionary) or die('can\'t find pspell dictionary');
-
-    $this->pspell_link = pspell_new_config($pspell_config);
-
-    pspell_add_to_personal($this->pspell_link, strtolower($addtodictionary)) or die('You can\'t add a word to the dictionary that contains any punctuation.');
-    pspell_save_wordlist($this->pspell_link);
-
-    $this->send_data('success');
-  }
-
 }

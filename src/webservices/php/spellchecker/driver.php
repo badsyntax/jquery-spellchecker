@@ -35,9 +35,40 @@ abstract class SpellChecker_Driver {
     echo json_encode($response);
   }
 
-  abstract public function get_suggestions();
+  public function get_suggestions()
+  {
+    $word = $_POST['word'];
 
-  abstract public function get_incorrect_words();
+    $this->send_data(NULL, $this->get_word_suggestions($word));
+  }
 
-  abstract public function add_to_dictionary();
+  public function get_incorrect_words()
+  {
+    $texts = (array) $_POST['text'];
+
+    $response = array();
+
+    foreach($texts as $text)
+    {
+      $words = explode(' ', $text);
+
+      $incorrect_words = array();
+
+      foreach($words as $word)
+      {
+        if (!$this->check_word($word))
+        {
+          $incorrect_words[] = $word;
+        }
+      }
+
+      $response[] = $incorrect_words;
+    }
+
+    $this->send_data('success', $response);
+  }
+
+  abstract public function get_word_suggestions($word = NULL);
+
+  abstract public function check_word($word = NULL);
 }

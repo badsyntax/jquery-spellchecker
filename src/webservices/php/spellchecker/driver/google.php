@@ -15,10 +15,8 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
     'lang' => 'en'
   );
 
-  public function get_suggestions()
+  public function get_word_suggestions($word = NULL)
   {
-    $word = $_POST['word'];
-
     $matches = $this->get_matches($word);
 
     $suggestions = array();
@@ -28,7 +26,7 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
       $suggestions = explode("\t", $matches[0][3]);
     }
 
-    $this->send_data(NULL, $suggestions);
+    return $suggestions;
   }
 
   public function get_incorrect_words()
@@ -55,7 +53,7 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
     $this->send_data('success', $response);
   }
 
-  public function add_to_dictionary() {}
+  public function check_word($word = NULL) {}
 
   private function get_matches($text)
   {

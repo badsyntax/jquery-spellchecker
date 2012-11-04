@@ -244,13 +244,8 @@
     } else {
       this.body = (this.element.length && this.element[0].nodeName === 'BODY') ? this.element : 'body';
     }
-<<<<<<< HEAD
-=======
     this.position = $.isFunction(config.suggestBox.position) ? config.suggestBox.position : this.position;
->>>>>>> master
     Box.apply(this, arguments);
-
-    this.position = $.isFunction(config.suggestBox.position) ? config.suggestBox.position : this.position;
   };
   inherits(SuggestBox, Box);
 
