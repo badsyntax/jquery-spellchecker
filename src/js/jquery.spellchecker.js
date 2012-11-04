@@ -1,5 +1,5 @@
 /*
- * jQuery Spellchecker - v0.2.1
+ * jQuery Spellchecker - v0.2.1 - 2012-11-03
  * https://github.com/badsyntax/jquery-spellchecker
  * Copyright (c) 2012 Richard Willis; Licensed MIT
  */
@@ -26,7 +26,8 @@
     suggestBox: {
       numWords: 5,
       position: 'above',
-      offset: 2
+      offset: 2,
+      appendTo: null
     },
     incorrectWords: {
       container: 'body', //selector
@@ -238,8 +239,14 @@
 
   var SuggestBox = function(config, element) {
     this.element = element;
-    this.body = (this.element.length && this.element[0].nodeName === 'BODY') ? this.element : 'body';
+    if (config.suggestBox.appendTo) {
+      this.body = $(config.suggestBox.appendTo);
+    } else {
+      this.body = (this.element.length && this.element[0].nodeName === 'BODY') ? this.element : 'body';
+    }
     Box.apply(this, arguments);
+
+    this.position = $.isFunction(config.suggestBox.position) ? config.suggestBox.position : this.position;
   };
   inherits(SuggestBox, Box);
 
@@ -653,6 +660,7 @@
 
   SpellChecker.prototype.check = function() {
     var text = this.parser.getText();
+    this.trigger('check.start');
     this.webservice.checkWords(text, this.onCheckWords.bind(this));
   };
 
@@ -680,6 +688,8 @@
   /* Event handlers */
 
   SpellChecker.prototype.onCheckWords = function(data) {
+
+    this.trigger('check.complete');
 
     var badWords = data.data;
     var outcome = 'success';
@@ -721,6 +731,7 @@
     this.spellCheckerElement = incorrectWords.spellCheckerElement;
     this.spellCheckerIndex = this.elements.index(this.spellCheckerElement);
     this.showSuggestedWords(word, element);
+    this.trigger('select.word', e);
   };
 
   $.SpellChecker = SpellChecker;
