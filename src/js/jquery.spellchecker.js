@@ -1,5 +1,5 @@
 /*
- * jQuery Spellchecker - v0.2.1
+ * jQuery Spellchecker - v0.2.2
  * https://github.com/badsyntax/jquery-spellchecker
  * Copyright (c) 2012 Richard Willis; Licensed MIT
  */
@@ -244,6 +244,10 @@
     } else {
       this.body = (this.element.length && this.element[0].nodeName === 'BODY') ? this.element : 'body';
     }
+<<<<<<< HEAD
+=======
+    this.position = $.isFunction(config.suggestBox.position) ? config.suggestBox.position : this.position;
+>>>>>>> master
     Box.apply(this, arguments);
 
     this.position = $.isFunction(config.suggestBox.position) ? config.suggestBox.position : this.position;
@@ -318,7 +322,6 @@
     this.footer.hide();
     this.open();
     this.words.html(show ? this.loadingMsg : '');
-    this.position();
   };
 
   SuggestBox.prototype.position = function() {
@@ -677,7 +680,7 @@
     this.parser.replaceWord(oldWord, replacement, element);
     this.suggestBox.reattach();
     this.incorrectWords.get(index).removeWord(this.incorrectWordElement);
-    this.trigger('replaceWord');
+    this.trigger('replace.word');
   };
 
   SpellChecker.prototype.destroy = function() {
