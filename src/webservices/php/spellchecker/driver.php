@@ -37,6 +37,11 @@ abstract class SpellChecker_Driver {
 
   public function get_suggestions()
   {
+    if (!isset($_POST['word']))
+    {
+      exit('Word not found');
+    }
+    
     $word = $_POST['word'];
 
     $this->send_data(NULL, $this->get_word_suggestions($word));
@@ -44,6 +49,11 @@ abstract class SpellChecker_Driver {
 
   public function get_incorrect_words()
   {
+    if (!isset($_POST['text']))
+    {
+      exit('No text found');
+    }
+
     $texts = (array) $_POST['text'];
 
     $response = array();

@@ -53,10 +53,10 @@ module.exports = function(grunt) {
         'src/js/libs/jquery/jquery-1.8.2.min.js',
         'src/js/jquery.spellchecker.js'
       ],
-      specs : 'test/spec/**/*.js'
+      specs : 'tests/javascript/spec/**/*.js'
     },
     lint: {
-      files: ['grunt.js', 'src/js/jquery.spellchecker.js', 'test/**/*.js']
+      files: ['grunt.js', 'src/js/jquery.spellchecker.js', 'tests/javascript/**/*.js']
     },
     jshint: {
       options: {
