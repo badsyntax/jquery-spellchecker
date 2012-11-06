@@ -9,7 +9,9 @@
  * @license    https://github.com/badsyntax/jquery-spellchecker/blob/master/LICENSE-MIT
  */
 
-class SpellChecker_Driver_Google extends Spellchecker_Driver
+namespace SpellChecker\Driver;
+
+class Google extends \SpellChecker\Driver
 {
   protected $_default_config = array(
     'lang' => 'en'
@@ -31,13 +33,12 @@ class SpellChecker_Driver_Google extends Spellchecker_Driver
 
   public function get_incorrect_words()
   {
-    $texts = (array) $_POST['text'];
+    $texts = (array) \SpellChecker\Request::post('text');
 
     $response = array();
 
     foreach($texts as $text)
     {    
-
       $words = $this->get_matches($text);
 
       $incorrect_words = array();

@@ -9,9 +9,10 @@
  * @license    https://github.com/badsyntax/jquery-spellchecker/blob/master/LICENSE-MIT
  */
 
-class SpellChecker_Driver_Enchant extends Spellchecker_Driver
-{
+namespace SpellChecker\Driver;
 
+class Enchant extends \SpellChecker\Driver
+{
   protected $_default_config = array(
     'lang' => 'en'
   );
@@ -41,6 +42,6 @@ class SpellChecker_Driver_Enchant extends Spellchecker_Driver
 
   public function check_word($word = NULL)
   {
-    return enchant_dict_check($this->dictionary, $word);
+    return !enchant_dict_check($this->dictionary, $word);
   }
 }

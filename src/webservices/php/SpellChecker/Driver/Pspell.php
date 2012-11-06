@@ -9,9 +9,10 @@
  * @license    https://github.com/badsyntax/jquery-spellchecker/blob/master/LICENSE-MIT
  */
 
-class SpellChecker_Driver_PSpell extends Spellchecker_Driver
-{
+namespace SpellChecker\Driver;
 
+class PSpell extends \SpellChecker\Driver
+{
   protected $_default_config = array(
     'dictionary' => 'pspell/dictionary',
     'lang' => 'en'
@@ -31,6 +32,6 @@ class SpellChecker_Driver_PSpell extends Spellchecker_Driver
 
   public function check_word($word = NULL)
   {
-    return pspell_check($this->pspell_link, $word);
+    return !pspell_check($this->pspell_link, $word);
   }
 }

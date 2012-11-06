@@ -8,7 +8,9 @@
  * @license    https://github.com/badsyntax/jquery-spellchecker/blob/master/LICENSE-MIT
  */
 
-abstract class SpellChecker_Driver {
+namespace SpellChecker;
+
+abstract class Driver {
 
   protected $_config = array();
 
@@ -25,7 +27,7 @@ abstract class SpellChecker_Driver {
 
     if ($outcome !== NULL)
     {
-      $response = new StdClass();
+      $response = new \StdClass();
       $response->outcome = $outcome;
       $response->data = $data;
     }
@@ -37,45 +39,25 @@ abstract class SpellChecker_Driver {
 
   public function get_suggestions()
   {
-    if (!isset($_POST['word']))
-    {
-      exit('Word not found');
-    }
-    
-    $word = $_POST['word'];
+    $word = Request::post('word');
 
     $this->send_data(NULL, $this->get_word_suggestions($word));
   }
 
   public function get_incorrect_words()
   {
-    if (!isset($_POST['text']))
-    {
-      exit('No text found');
-    }
-
-    $texts = (array) $_POST['text'];
-
-    $response = array();
-
-    foreach($texts as $text)
-    {
-      $words = explode(' ', $text);
-
-      $incorrect_words = array();
-
-      foreach($words as $word)
-      {
-        if (!$this->check_word($word))
-        {
-          $incorrect_words[] = $word;
-        }
-      }
-
-      $response[] = $incorrect_words;
-    }
+    $texts = (array) Request::post('text');
+    $callback = array($this, '_get_incorred_words');
+    $response = array_map($callback, $texts);
 
     $this->send_data('success', $response);
+  }
+
+  public function _get_incorred_words($text)
+  {
+    $words = explode(' ', $text);
+    $callback = array($this, 'check_word');
+    return array_values(array_filter($words, $callback));
   }
 
   abstract public function get_word_suggestions($word = NULL);
