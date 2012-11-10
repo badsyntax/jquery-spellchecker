@@ -470,9 +470,9 @@
   };
   inherits(TextParser, Parser);
 
-  TextParser.prototype.getText = function(text) {
+  TextParser.prototype.getText = function(text, textGetter) {
     return $.map(this.elements, function(element) {
-      return this.clean($(element).val());
+      return this.clean(textGetter ? textGetter(element) : $(element).val());
     }.bind(this));
   };
 
@@ -495,20 +495,23 @@
   };
   inherits(HtmlParser, Parser);
 
-  HtmlParser.prototype.getText = function(text) {
-    text = $(text);
-    if (text.length) {
+  HtmlParser.prototype.getText = function(text, textGetter) {
+    if (text && (text = $(text)).length) {
       return this.clean(text.text());
     }
     return $.map(this.elements, function(element) {
 
-      element = $(element)
+      if (textGetter) {
+        text = textGetter(element);
+      } else {
+        text = $(element)
         .clone()
         .find('[class^="spellchecker-"]')
         .remove()
         .end();
-
-      return this.clean(element.text());
+      }
+      
+      return this.clean(text);
 
     }.bind(this));
   };
@@ -685,7 +688,7 @@
 
   SpellChecker.prototype.check = function(text, callback) {
     this.trigger('check.start');
-    text = typeof text === 'string' ? this.parser.clean(text) : this.parser.getText(text || '');
+    text = typeof text === 'string' ? this.parser.clean(text) : this.parser.getText(text || '', this.config.getText);
     this.webservice.checkWords(text, this.onCheckWords(callback));
   };
 
