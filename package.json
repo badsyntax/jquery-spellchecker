@@ -1,6 +1,6 @@
 {
   "name": "jquery-spellchecker",
-  "version": "0.2.2-ignored",
+  "version": "0.2.3-ignored",
   "engines": {
     "node": ">= 0.6.0"
   },

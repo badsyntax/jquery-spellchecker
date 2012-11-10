@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery Spell Checker example - Text parser using PSpell</title>
+  <meta name="description" content="">
+  <link rel="stylesheet" type="text/css" media="screen" href="../../css/jquery.spellchecker.css" />
+</head>
+<body>
+    <p>This example demonstrates how you can use the spellchecker as a standalone library.</p>
+    <p><em>View source</em></p>
+  </div>
+  <script type="text/javascript" src="../../js/libs/jquery/jquery-1.8.2.min.js"></script>
+  <script type="text/javascript" src="../../js/jquery.spellchecker.js"></script>
+  <script type="text/javascript">
+    (function() {
+
+      var text = 'Herea is a sentancec. "How are youu?"';
+      
+      var elem = $('<div />').append($.map(text.split(' '), function(text, i) {
+        return new Array(i).join('<div>') + text + new Array(2).join(' </div>')
+      }).join(''));
+      
+      // Creates new spellchecker instances
+      var spellchecker = function(parser) {
+        return new $.SpellChecker(null, {
+          lang: 'en',
+          parser: parser,
+          webservice: {
+            path: '../../webservices/php/SpellChecker.php',
+            driver: 'pspell'
+          }
+        });
+      };
+      
+      // Check for incorrect words in a string of text
+      spellchecker('text').check(text, function(incorrectWords) {
+        // console.log(incorrectWords);
+      });
+
+      // Check for incorrect words in a DOM tree
+      spellchecker('html').check(elem, function(incorrectWords) {
+        // console.log(incorrectWords);
+      });
+
+      // Get spelling suggestions for a word
+      spellchecker('text').getSuggestions('badwordd', function(suggestions) {
+       // console.log(suggestions);
+      });
+
+      // Replace a word in a string of text
+      var newText = spellchecker('text').replaceWord('Herea', 'Here', text);
+      // console.log(newText);
+
+      // Replace a word in a DOM tree
+      spellchecker('html').replaceWord('Herea', 'Here', elem);
+      // console.log(elem.text());
+    })();
+  </script>
+</body>
+</html>

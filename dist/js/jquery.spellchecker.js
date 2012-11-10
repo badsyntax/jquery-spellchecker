@@ -1,5 +1,5 @@
 /*
- * jQuery Spellchecker - v0.2.2 - 2012-11-04
+ * jQuery Spellchecker - v0.2.3 - 2012-11-10
  * https://github.com/badsyntax/jquery-spellchecker
  * Copyright (c) 2012 Richard Willis; Licensed MIT
  */
@@ -26,7 +26,8 @@
     suggestBox: {
       numWords: 5,
       position: 'above',
-      offset: 2
+      offset: 2,
+      appendTo: null
     },
     incorrectWords: {
       container: 'body', //selector
@@ -77,8 +78,11 @@
       this._handlers[name].add(handler);
     },
     trigger: function(name) {
+      var args = Array.prototype.slice.call(arguments, 1);
+      if ($.isFunction(name)) {
+        return name.apply(this, args);
+      }
       if (this._handlers[name]) {
-        var args = Array.prototype.slice.call(arguments, 1);
         this._handlers[name].fireWith(this, args);
       }
     },
@@ -304,19 +308,16 @@
     this.words.html(html);
   };
 
-  SuggestBox.prototype.loadSuggestedWords = function(getWords, word, wordElement) {
-
+  SuggestBox.prototype.showSuggestedWords = function(getWords, word, wordElement) {
     this.wordElement = $(wordElement);
-    this.loading(true);
-
     getWords(word, this.onGetWords.bind(this));
   };
 
   SuggestBox.prototype.loading = function(show) {
     this.footer.hide();
-    this.open();
     this.words.html(show ? this.loadingMsg : '');
     this.position();
+    this.open();
   };
 
   SuggestBox.prototype.position = function() {
@@ -364,19 +365,19 @@
     this.container.appendTo(this.body);
   };
 
-  SuggestBox.prototype.onGetWords = function(words) {
-    this.loading(false);
-    this.addWords(words);
-    this.footer.show();
-    this.position();
-  };
-
   SuggestBox.prototype.onContainerClick = function(e) {
     e.stopPropagation();
   };
 
   SuggestBox.prototype.onWindowClick = function(e) {
     this.close();
+  };
+
+  SuggestBox.prototype.onGetWords = function(words) {
+    this.addWords(words);
+    this.footer.show();
+    this.position();
+    this.open();
   };
 
   SuggestBox.prototype.destroy = function() {
@@ -422,7 +423,7 @@
     });
   };
 
-  WebService.prototype.getSuggestedWords = function(word, callback) {
+  WebService.prototype.getSuggestions = function(word, callback) {
     return this.makeRequest({
       data: {
         action: 'get_suggestions',
@@ -441,17 +442,17 @@
 
   Parser.prototype.clean = function(text) {
 
-    text = ' ' + text + ' '; // Typecast to string to prevent exceptions;
+    text = '' + text; // Typecast to string to prevent exceptions;
     text = text.replace(new RegExp('<[^>]+>', 'g'), ''); // strip any html tags
 
     var puncExpr = [
+      '(^|\\s+)[' + punctuationChars + ']+',                        // punctuation(s) with leading whitespace(s)
       '[' + punctuationChars + ']+\\s+[' + punctuationChars + ']+', // punctuation(s) with leading and trailing whitespace(s)
-      '[' + punctuationChars + ']+\\s+',                            // puncutation(s) with trailing whitespace(s)
-      '\\s+[' + punctuationChars + ']+'                             // punctuation(s) with leading whitespace(s)
+      '[' + punctuationChars + ']+(\\s+|$)'                         // puncutation(s) with trailing whitespace(s)
     ].join('|');
 
     text = text.replace(new RegExp(puncExpr, 'g'), ' '); // strip any punctuation
-    text = $.trim(text.replace(/\s{2,}/g, ' '));      // remove extra whitespace
+    text = $.trim(text.replace(/\s{2,}/g, ' '));         // remove extra whitespace
 
     // Remove numbers
     text = $.map(text.split(' '), function(word) {
@@ -469,23 +470,20 @@
   };
   inherits(TextParser, Parser);
 
-  TextParser.prototype.getText = function() {
+  TextParser.prototype.getText = function(text, textGetter) {
     return $.map(this.elements, function(element) {
-      return this.clean($(element).val());
+      return this.clean(textGetter ? textGetter(element) : $(element).val());
     }.bind(this));
   };
 
-  TextParser.prototype.replaceWordInText = function(text, oldWord, newWord) {
+  TextParser.prototype.replaceWordInText = function(oldWord, newWord, text) {
     var regex = new RegExp('(^|[^' + letterChars + '])(' + RegExp.escape(oldWord) + ')(?=[^' + letterChars + ']|$)', 'g');
     return (text + '').replace(regex, '$1' + newWord);
   };
 
   TextParser.prototype.replaceWord = function(oldWord, replacement, element) {
-    if (!element) {
-      throw 'Element to replace text not specified';
-    }
     element = $(element);
-    var newText = this.replaceWordInText(element.val(), oldWord, replacement);
+    var newText = this.replaceWordInText(oldWord, replacement, element.val());
     element.val(newText);
   };
 
@@ -497,17 +495,23 @@
   };
   inherits(HtmlParser, Parser);
 
-  HtmlParser.prototype.getText = function() {
-
+  HtmlParser.prototype.getText = function(text, textGetter) {
+    if (text && (text = $(text)).length) {
+      return this.clean(text.text());
+    }
     return $.map(this.elements, function(element) {
 
-      element = $(element)
+      if (textGetter) {
+        text = textGetter(element);
+      } else {
+        text = $(element)
         .clone()
         .find('[class^="spellchecker-"]')
         .remove()
         .end();
-
-      return this.clean(element.text());
+      }
+      
+      return this.clean(text);
 
     }.bind(this));
   };
@@ -619,9 +623,12 @@
 
     this.setupWebService();
     this.setupParser();
-    this.setupSuggestBox();
-    this.setupIncorrectWords();
-    this.bindEvents();
+
+    if (this.elements.length) {
+      this.setupSuggestBox();
+      this.setupIncorrectWords();
+      this.bindEvents();
+    }
   };
   inherits(SpellChecker, Events);
 
@@ -630,15 +637,38 @@
   };
 
   SpellChecker.prototype.setupSuggestBox = function() {
+    
     this.suggestBox = new SuggestBox(this.config, this.elements);
+    
+    this.on('replace.word.before', function() {
+      this.suggestBox.close();
+      this.suggestBox.detach();
+    }.bind(this));
+
+    this.on('replace.word', function() {
+      this.suggestBox.reattach();
+    }.bind(this));
+
+    this.on('destroy', function() {
+        this.suggestBox.destroy();
+    }.bind(this));
   };
 
   SpellChecker.prototype.setupIncorrectWords = function() {
+
     this.incorrectWords = new Collection(this.elements, function(element) {
       return this.config.parser === 'html' ? 
         new IncorrectWordsInline(this.config, this.parser, element) : 
         new IncorrectWordsBox(this.config, this.parser, element);
     }.bind(this));
+
+    this.on('replace.word', function(index) {
+      this.incorrectWords.get(index).removeWord(this.incorrectWordElement);
+    }.bind(this));
+
+    this.on('destroy', function() {
+      this.incorrectWords.destroy();
+    }, this);
   };
 
   SpellChecker.prototype.setupParser = function() {
@@ -656,47 +686,55 @@
 
   /* Pubic API methods */
 
-  SpellChecker.prototype.check = function() {
-    var text = this.parser.getText();
-    this.webservice.checkWords(text, this.onCheckWords.bind(this));
+  SpellChecker.prototype.check = function(text, callback) {
+    this.trigger('check.start');
+    text = typeof text === 'string' ? this.parser.clean(text) : this.parser.getText(text || '', this.config.getText);
+    this.webservice.checkWords(text, this.onCheckWords(callback));
   };
 
-  SpellChecker.prototype.showSuggestedWords = function(word, element) {
-    var getWords = this.webservice.getSuggestedWords.bind(this.webservice);
-    this.suggestBox.loadSuggestedWords(getWords, word, element);
+  SpellChecker.prototype.getSuggestions = function(word, callback) {
+    this.webservice.getSuggestions(word, callback);
   };
 
-  SpellChecker.prototype.replaceWord = function(oldWord, replacement, element) {
-    element = element || this.spellCheckerElement;
+  SpellChecker.prototype.replaceWord = function(oldWord, replacement, elementOrText) {
+    
+    if (typeof elementOrText === 'string') {
+      return this.parser.replaceWordInText(oldWord, replacement, elementOrText);
+    }
+
+    var element = elementOrText || this.spellCheckerElement;
     var index = this.elements.index(element);
-    this.suggestBox.close();
-    this.suggestBox.detach();
+
+    this.trigger('replace.word.before');
     this.parser.replaceWord(oldWord, replacement, element);
-    this.suggestBox.reattach();
-    this.incorrectWords.get(index).removeWord(this.incorrectWordElement);
-    this.trigger('replace.word');
+    this.trigger('replace.word', index);
   };
 
   SpellChecker.prototype.destroy = function() {
-    this.suggestBox.destroy();
-    this.incorrectWords.destroy();
+    this.trigger('destroy');
   };
 
   /* Event handlers */
 
-  SpellChecker.prototype.onCheckWords = function(data) {
+  SpellChecker.prototype.onCheckWords = function(callback) {
+    
+    return function(data) {
 
-    var badWords = data.data;
-    var outcome = 'success';
+      var incorrectWords = data.data;
+      var outcome = 'success';
 
-    $.each(badWords, function(i, words) {
-      if (words.length) {
-        outcome = 'fail';
-        return false;
-      }
-    });
+      $.each(incorrectWords, function(i, words) {
+        if (words.length) {
+          outcome = 'fail';
+          return false;
+        }
+      });
 
-    this.trigger('check.' + outcome, badWords);
+      this.trigger('check.complete');
+      this.trigger('check.' + outcome, incorrectWords);
+      this.trigger(callback, incorrectWords);
+
+    }.bind(this);
   };
 
   SpellChecker.prototype.onCheckFail = function(badWords) {
@@ -725,7 +763,8 @@
     this.incorrectWordElement = element;
     this.spellCheckerElement = incorrectWords.spellCheckerElement;
     this.spellCheckerIndex = this.elements.index(this.spellCheckerElement);
-    this.showSuggestedWords(word, element);
+    this.suggestBox.showSuggestedWords(this.getSuggestions.bind(this), word, element);
+    this.trigger('select.word', e);
   };
 
   $.SpellChecker = SpellChecker;
