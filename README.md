@@ -27,7 +27,7 @@ The plugin has been tested and works with the following browsers:
 ## Requirements
 
 * jQuery
-* A back-end webservice to check the spelling of text. You will need put the plugin on a webserver that supports PHP5 to use the default webservice.
+* PHP5.3+ to use the default webservice
 
 ## Download
 
