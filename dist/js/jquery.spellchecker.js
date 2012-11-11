@@ -508,7 +508,8 @@
         .clone()
         .find('[class^="spellchecker-"]')
         .remove()
-        .end();
+        .end()
+        .text();
       }
       
       return this.clean(text);
