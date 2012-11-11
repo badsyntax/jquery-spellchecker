@@ -47,7 +47,7 @@
           (!/jqueryspellchecker/.test(control.id)) && control.setDisabled(disabled);
         });
       });
-      // this.editor.getBody().setAttribute('contenteditable', editable);
+      this.editor.getBody().setAttribute('contenteditable', editable);
     },
 
     disableEditor: function() {

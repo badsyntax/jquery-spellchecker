@@ -6,71 +6,90 @@
 
 CKEDITOR.plugins.add('jqueryspellchecker', {
 
+  config: {
+    lang: 'en',
+    parser: 'html',
+    webservice: {
+      path: '/webservices/php/SpellChecker.php',
+      driver: 'pspell'
+    },
+    suggestBox: {
+      position: 'below',
+      appendTo: 'body'
+    }
+  },
+
   init: function( editor ) {
 
+    var t = this;
     var pluginName = 'jqueryspellchecker';
+
+    this.config.suggestBox.position = this.positionSuggestBox();
     
-    editor.addCommand( pluginName, CKEDITOR.plugins.jQuerySpellChecker );
+    editor.addCommand(pluginName, {
+      canUndo: false,
+      readOnly: 1,
+      exec: function() {
+        t.toggle(editor);
+      }
+    });
 
     editor.ui.addButton('jQuerySpellChecker', {
       label: 'SpellCheck',
       icon: 'spellchecker',
       command: pluginName
     });
-  }
-});
 
-CKEDITOR.plugins.jQuerySpellChecker = {
-  exec: function( editor ) {
-    this.toggleSpellChecker(editor);
-  },
-  canUndo: false,
-  readOnly: 1,
-  toggleSpellChecker: function(editor) {
-
-    this.editor = editor;
-
-    if (!this.spellchecker) {
-      editor.setReadOnly(true);
-      this.createSpellchecker();
-      this.spellchecker.check();
-    } else {
-      editor.setReadOnly(false);
-      this.spellchecker.destroy();
-      this.spellchecker = null;
-    }
-
-    editor.commands.jqueryspellchecker.toggleState();
-  },
-  createSpellchecker: function() {
-
-    var t = this;
-    var ed = t.editor;
-
-    t.spellchecker = new $.SpellChecker(ed.document.$.body, {
-      lang: 'en',
-      parser: 'html',
-      webservice: {
-        path: "/php/spellchecker.php",
-        driver: 'pspell'
-      },
-      suggestBox: {
-        position: 'below',
-        appendTo: 'body',
-        position: this.positionSuggestBox()
-      }
+    editor.on('saveSnapshot', function() {
+      t.destroy();
     });
+  },
+
+  create: function() {
+    this.createSpellchecker();
+    this.editor.setReadOnly(true);
+    this.spellchecker.check();
+    this.editor.commands.jqueryspellchecker.toggleState();
+  },
+
+  destroy: function() {
+    if (!this.spellchecker) 
+      return;
+    this.spellchecker.destroy();
+    this.spellchecker = null;
+    this.editor.setReadOnly(false);
+    this.editor.commands.jqueryspellchecker.toggleState();
+  },
+
+  toggle: function(editor) {
+    this.editor = editor;
+    if (!this.spellchecker) {
+      this.create();
+    } else {
+      this.destroy();
+    }
+  },
+
+  createSpellchecker: function() {
+    var t = this;
+
+    t.config.getText = function() {
+      return $('<div >').append(t.editor.getData()).text();
+    };
+
+    t.spellchecker = new $.SpellChecker(t.editor.document.$.body, this.config);
 
     t.spellchecker.on('check.success', function() {
       alert('There are no incorrectly spelt words.');
-      t.exec();
+      t.destroy();
     });
     t.spellchecker.on('replace.word', function() {
       if (t.spellchecker.parser.incorrectWords.length === 0) {
-        t.exec();
+        t.destroy();
       }
     });
   },
+
   positionSuggestBox: function() {
 
     var t = this;
@@ -89,8 +108,8 @@ CKEDITOR.plugins.jQuerySpellChecker = {
 
       this.container.css({ 
         top: top, 
-        left: left 
+        left: left  
       });
     };
-  },
-};
+  }
+});

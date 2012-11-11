@@ -74,8 +74,6 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
     var t = this;
 
     t.config.getText = function() {
-      console.log(t.editor.getData());
-      console.log(t.editor);
       return $('<div >').append(t.editor.getData()).text();
     };
 
