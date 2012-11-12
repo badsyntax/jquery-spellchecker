@@ -37,7 +37,8 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
     editor.ui.addButton('jQuerySpellChecker', {
       label: 'SpellCheck',
       icon: 'spellchecker',
-      command: pluginName
+      command: pluginName,
+      toolbar: 'spellchecker,10'
     });
 
     editor.on('saveSnapshot', function() {
