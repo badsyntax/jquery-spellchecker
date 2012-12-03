@@ -459,6 +459,9 @@
       return (/^\d+$/.test(word)) ? null : word;
     }).join(' ');
 
+    // Convert white
+    text = text.replace(/\xA0|\s+/mg, ' ');
+
     return text;
   };
 
@@ -508,7 +511,8 @@
         .clone()
         .find('[class^="spellchecker-"]')
         .remove()
-        .end();
+        .end()
+        .text();
       }
       
       return this.clean(text);
@@ -572,11 +576,18 @@
     if (!incorrectWords.length) {
       return;
     }
+
     this.incorrectWords = incorrectWords;
+    incorrectWords = $.map(incorrectWords, function(word) {
+      return RegExp.escape(word);
+    })
 
-    var regExp = new RegExp('(^|[^' + letterChars + '])(' + incorrectWords.join('|') + ')(?=[^' + letterChars + ']|$)', 'g');
+    var regExp = '';
+    regExp += '(^|[^' + letterChars + '])?';
+    regExp += '(' + incorrectWords.join('|') + ')';
+    regExp += '(?=[^' + letterChars + ']|$)?';
 
-    this.replaceText(regExp, element[0], this.highlightWordsHandler(incorrectWords), 2);
+    this.replaceText(new RegExp(regExp, 'g'), element[0], this.highlightWordsHandler(incorrectWords), 2);
   };
 
   HtmlParser.prototype.highlightWordsHandler = function(incorrectWords) {
@@ -585,6 +596,7 @@
     var replaceElement;
 
     return function(fill, i) {
+
       // Replacement node
       var span = $('<span />', {
         'class': pluginName + '-word-highlight'
