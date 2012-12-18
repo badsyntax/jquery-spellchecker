@@ -47,7 +47,6 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
   },
 
   create: function() {
-<<<<<<< HEAD
 
     this.editor.setReadOnly(true);
     this.editor.commands.jqueryspellchecker.toggleState();
@@ -74,23 +73,6 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
     $(this.editorWindow).off('.spellchecker');
   },
 
-=======
-    this.createSpellchecker();
-    this.editor.setReadOnly(true);
-    this.spellchecker.check();
-    this.editor.commands.jqueryspellchecker.toggleState();
-  },
-
-  destroy: function() {
-    if (!this.spellchecker) 
-      return;
-    this.spellchecker.destroy();
-    this.spellchecker = null;
-    this.editor.setReadOnly(false);
-    this.editor.commands.jqueryspellchecker.toggleState();
-  },
-
->>>>>>> 79149165ccb2546ed97ef41202aa7f599b725314
   toggle: function(editor) {
     this.editor = editor;
     if (!this.spellchecker) {
