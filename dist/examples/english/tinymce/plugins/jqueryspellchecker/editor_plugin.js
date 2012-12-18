@@ -1,4 +1,3 @@
-
 /*
  * jQuery Spellchecker - TinyMCE Plugin - v0.2.4
  * https://github.com/badsyntax/jquery-spellchecker
