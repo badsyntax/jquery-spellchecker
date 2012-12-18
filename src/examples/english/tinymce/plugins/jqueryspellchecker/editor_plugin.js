@@ -1,5 +1,6 @@
+
 /*
- * jQuery Spellchecker - TinyMCE Plugin - v0.2.1
+ * jQuery Spellchecker - TinyMCE Plugin - v0.2.3
  * https://github.com/badsyntax/jquery-spellchecker
  * Copyright (c) 2012 Richard Willis; Licensed MIT
  */
@@ -14,7 +15,7 @@
         author : 'Richard Willis',
         authorurl : 'http://badsyntax.co',
         infourl : 'https://github.com/badsyntax/jquery-spellchecker',
-        version : '0.1.0'
+        version : '0.1.1'
       };
     },
 
@@ -30,12 +31,31 @@
       if (!t.spellchecker) {
         t.createSpellchecker();
         t.spellchecker.check();
+        t.disableEditor();
         t.editor.controlManager.setActive('jqueryspellchecker', true);
       } else {
         t.spellchecker.destroy();
         t.spellchecker = null;
+        t.enableEditor();
         t.editor.controlManager.setActive('jqueryspellchecker', false);
       }
+    },
+
+    toggleEditor: function(disabled, editable) {
+      $.each(this.editor.theme.toolbarGroup.controls, function(i, controls) {
+        $.each(controls.controls, function(c, control) {
+          (!/jqueryspellchecker/.test(control.id)) && control.setDisabled(disabled);
+        });
+      });
+      this.editor.getBody().setAttribute('contenteditable', editable);
+    },
+
+    disableEditor: function() {
+      this.toggleEditor(true, false);
+    },
+
+    enableEditor: function() {
+      this.toggleEditor(false, true);
     },
 
     createSpellchecker: function() {
@@ -47,13 +67,16 @@
         lang: 'en',
         parser: 'html',
         webservice: {
-          path: "/php/spellchecker.php",
+          path: "/webservices/php/SpellChecker.php",
           driver: 'pspell'
         },
         suggestBox: {
           position: 'below',
           appendTo: 'body',
           position: this.positionSuggestBox()
+        },
+        getText: function() {
+          return ed.getContent();
         }
       });
 

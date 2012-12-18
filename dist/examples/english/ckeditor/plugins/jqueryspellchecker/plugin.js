@@ -1,5 +1,5 @@
 ﻿/*
- * jQuery Spellchecker - CKeditor Plugin - v0.2.3
+ * jQuery Spellchecker - CKeditor Plugin - v0.2.2
  * https://github.com/badsyntax/jquery-spellchecker
  * Copyright (c) 2012 Richard Willis; Licensed MIT
  */
@@ -37,8 +37,7 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
     editor.ui.addButton('jQuerySpellChecker', {
       label: 'SpellCheck',
       icon: 'spellchecker',
-      command: pluginName,
-      toolbar: 'spellchecker,10'
+      command: pluginName
     });
 
     editor.on('saveSnapshot', function() {
@@ -47,34 +46,6 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
   },
 
   create: function() {
-<<<<<<< HEAD
-
-    this.editor.setReadOnly(true);
-    this.editor.commands.jqueryspellchecker.toggleState();
-    this.editorWindow = this.editor.document.getWindow().$;
-
-    this.createSpellchecker();
-    this.spellchecker.check();
-    
-    $(this.editorWindow)
-    .on('scroll.spellchecker', $.proxy(function scroll(){
-      if (this.spellchecker.suggestBox) {
-        this.spellchecker.suggestBox.close();
-      }
-    }, this));
-  },
-
-  destroy: function() {
-    if (!this.spellchecker) 
-      return;
-    this.spellchecker.destroy();
-    this.spellchecker = null;
-    this.editor.setReadOnly(false);
-    this.editor.commands.jqueryspellchecker.toggleState();
-    $(this.editorWindow).off('.spellchecker');
-  },
-
-=======
     this.createSpellchecker();
     this.editor.setReadOnly(true);
     this.spellchecker.check();
@@ -90,7 +61,6 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
     this.editor.commands.jqueryspellchecker.toggleState();
   },
 
->>>>>>> 79149165ccb2546ed97ef41202aa7f599b725314
   toggle: function(editor) {
     this.editor = editor;
     if (!this.spellchecker) {
@@ -104,7 +74,7 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
     var t = this;
 
     t.config.getText = function() {
-      return $('<div />').append(t.editor.getData()).text();
+      return $('<div >').append(t.editor.getData()).text();
     };
 
     t.spellchecker = new $.SpellChecker(t.editor.document.$.body, this.config);
@@ -135,8 +105,6 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
 
       var left = p3.left + p2.left;
       var top = p3.top + p2.top + (p1.top - p2.top) + word.offsetHeight;
-
-      top -= $(t.editorWindow).scrollTop();
 
       this.container.css({ 
         top: top, 

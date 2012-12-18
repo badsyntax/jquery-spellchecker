@@ -1,19 +1,22 @@
 # jQuery Spellchecker
 
-The jQuery Spellchecker is a Javascript spellchecker in the form of a lightweight jQuery plugin that can be used to check the spelling of text within a form field or within a DOM tree.
+The jQuery Spellchecker is a free Javascript spellchecker in the form of a lightweight jQuery plugin that can be used to check the spelling of text within a form field or within a DOM tree.
 This is a complete rewrite of the [initial spellchecker](http://code.google.com/p/jquery-spellchecker/) plugin I wrote.
 
-The current version of the plugin is v0.2.2 beta.
+The current version of the plugin is v0.2.3 beta.
 
 ## Features
 
 * Unicode support (works with most languages)
 * HTML parsing (for using the spellchecker within WSYIWYG editors)
 * Text parsing (for using the spellchecker on form fields)
-* Event based
 * Multiple fields
-* MIT licensed (it will always be free)
+* Multiple PHP back-end drivers (Enchant, PSpell, Google)
+* Friendly API
+* Event based
+* MIT licensed
 * Actively developed
+
 
 ## Browser support
 
@@ -24,7 +27,7 @@ The plugin has been tested and works with the following browsers:
 ## Requirements
 
 * jQuery
-* A back-end webservice to check the spelling of text. You will need put the plugin on a webserver that supports PHP5 to use the default webservice.
+* PHP5.3+ to use the default webservice
 
 ## Download
 

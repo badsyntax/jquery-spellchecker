@@ -1,4 +1,4 @@
-/*global describe:false, expect:false, $:false, it:false, spyOn:false, beforeEach:false, afterEach:false*/
+/*global describe:false, expect:false, $:false, it:false, spyOn:false, beforeEach:false, afterEach:false, runs:false, waitsFor:false*/
 
 describe("SpellChecker", function() {
 
@@ -352,7 +352,7 @@ describe("SpellChecker", function() {
       var text = 'Herea is a sentancec. "How are youu?"';
 
       var elem = $('<div />').append($.map(text.split(' '), function(text, i) {
-        return new Array(i).join('<div>') + text + new Array(2).join(' </div>')
+        return new Array(i).join('<div>') + text + new Array(2).join(' </div>');
       }).join(''));
 
       var callbacks = {
