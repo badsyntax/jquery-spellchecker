@@ -2,7 +2,7 @@
   "name": "jquery.spellchecker",
   "title": "jQuery Spellchecker",
   "description": "A jquery spellchecker plugin",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "homepage": "https://github.com/badsyntax/jquery-spellchecker",
   "author": {
     "name": "Richard Willis",

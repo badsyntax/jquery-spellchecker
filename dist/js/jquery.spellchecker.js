@@ -1,5 +1,5 @@
 /*
- * jQuery Spellchecker - v0.2.3 - 2012-11-11
+ * jQuery Spellchecker - v0.2.3 - 2012-12-18
  * https://github.com/badsyntax/jquery-spellchecker
  * Copyright (c) 2012 Richard Willis; Licensed MIT
  */
@@ -459,6 +459,9 @@
       return (/^\d+$/.test(word)) ? null : word;
     }).join(' ');
 
+    // Convert white
+    text = text.replace(/\xA0|\s+/mg, ' ');
+
     return text;
   };
 
@@ -569,15 +572,21 @@
   };
 
   HtmlParser.prototype.highlightWords = function(incorrectWords, element) {
-
     if (!incorrectWords.length) {
       return;
     }
+
     this.incorrectWords = incorrectWords;
+    incorrectWords = $.map(incorrectWords, function(word) {
+      return RegExp.escape(word);
+    });
 
-    var regExp = new RegExp('(^|[^' + letterChars + '])(' + incorrectWords.join('|') + ')(?=[^' + letterChars + ']|$)', 'g');
+    var regExp = '';
+    regExp += '(^|[^' + letterChars + '])?';
+    regExp += '(' + incorrectWords.join('|') + ')';
+    regExp += '(?=[^' + letterChars + ']|$)?';
 
-    this.replaceText(regExp, element[0], this.highlightWordsHandler(incorrectWords), 2);
+    this.replaceText(new RegExp(regExp, 'g'), element[0], this.highlightWordsHandler(incorrectWords), 2);
   };
 
   HtmlParser.prototype.highlightWordsHandler = function(incorrectWords) {
@@ -586,6 +595,7 @@
     var replaceElement;
 
     return function(fill, i) {
+
       // Replacement node
       var span = $('<span />', {
         'class': pluginName + '-word-highlight'
@@ -694,6 +704,9 @@
   };
 
   SpellChecker.prototype.getSuggestions = function(word, callback) {
+    if (this.suggestBox) {
+      this.suggestBox.loading(true);
+    }
     this.webservice.getSuggestions(word, callback);
   };
 
