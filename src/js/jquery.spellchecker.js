@@ -705,6 +705,9 @@
   };
 
   SpellChecker.prototype.getSuggestions = function(word, callback) {
+    if (this.suggestBox) {
+      this.suggestBox.loading(true);
+    }
     this.webservice.getSuggestions(word, callback);
   };
 
