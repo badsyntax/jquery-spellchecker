@@ -1,5 +1,5 @@
 /*
- * jQuery Spellchecker - v0.2.4 - 2012-12-18
+ * jQuery Spellchecker - v0.2.4 - 2012-12-19
  * https://github.com/badsyntax/jquery-spellchecker
  * Copyright (c) 2012 Richard Willis; Licensed MIT
  */
@@ -51,6 +51,10 @@
     F.prototype = _super.prototype;
     _sub.prototype = new F();
     _sub.prototype.constructor = _sub;
+  };
+
+  var decode = function(text) {
+    return $('<div />').html(text).html();
   };
 
   RegExp.escape = function(text) {
@@ -105,7 +109,7 @@
 
       var element = $(e.currentTarget);
       var word = $.trim(element.data('word') || element.text());
-    
+
       this.trigger(handlerName, e, word, element, this);
 
     }.bind(this);
@@ -221,7 +225,7 @@
   inherits(IncorrectWordsInline, Events);
 
   IncorrectWordsInline.prototype.bindEvents = function() {
-    this.element.on('click', '.' + pluginName + '-word-highlight', selectWordHandler.call(this, 'select.word'));
+    this.element.on('click.' + pluginName, '.' + pluginName + '-word-highlight', selectWordHandler.call(this, 'select.word'));
   };
 
   IncorrectWordsInline.prototype.addWords = function(words) {
@@ -232,6 +236,7 @@
   IncorrectWordsInline.prototype.removeWord = function(elem) {};
 
   IncorrectWordsInline.prototype.destroy = function() {
+    this.element.off('.' + pluginName);
     try {
       window.findAndReplaceDOMText.revert();
     } catch(e) {}
@@ -315,7 +320,7 @@
 
   SuggestBox.prototype.loading = function(show) {
     this.footer.hide();
-    this.words.html(show ? this.loadingMsg : '');
+    this.words.html(show ? this.loadingMsg.clone() : '');
     this.position();
     this.open();
   };
@@ -442,8 +447,10 @@
 
   Parser.prototype.clean = function(text) {
 
-    text = '' + text; // Typecast to string to prevent exceptions;
-    text = text.replace(new RegExp('<[^>]+>', 'g'), ''); // strip any html tags
+    text = '' + text; // Typecast to string
+    text = decode(text); // Decode HTML characters
+    text = text.replace(/\xA0|\s+|(&nbsp;)/mg, ' '); // Convert whitespace
+    text = text.replace(new RegExp('<[^>]+>', 'g'), ''); // Strip HTML tags
 
     var puncExpr = [
       '(^|\\s+)[' + punctuationChars + ']+',                        // punctuation(s) with leading whitespace(s)
@@ -458,9 +465,6 @@
     text = $.map(text.split(' '), function(word) {
       return (/^\d+$/.test(word)) ? null : word;
     }).join(' ');
-
-    // Convert white
-    text = text.replace(/\xA0|\s+/mg, ' ');
 
     return text;
   };
@@ -582,9 +586,9 @@
     });
 
     var regExp = '';
-    regExp += '(^|[^' + letterChars + '])?';
+    regExp += '([^' + letterChars + '])';
     regExp += '(' + incorrectWords.join('|') + ')';
-    regExp += '(?=[^' + letterChars + ']|$)?';
+    regExp += '(?=[^' + letterChars + '])';
 
     this.replaceText(new RegExp(regExp, 'g'), element[0], this.highlightWordsHandler(incorrectWords), 2);
   };
@@ -594,7 +598,7 @@
     var c;
     var replaceElement;
 
-    return function(fill, i) {
+    return function(fill, i, word) {
 
       // Replacement node
       var span = $('<span />', {
@@ -611,7 +615,7 @@
       .text(fill)
       .data({
         'firstElement': replaceElement,
-        'word': incorrectWords[i]
+        'word': word
       });
 
       return span[0];
@@ -755,6 +759,10 @@
     this.suggestBox.detach();
     $.each(badWords, function(i, words) {
       if (words.length) {
+        // Make array unique
+        words = $.grep(words, function(el, index){
+          return index === $.inArray(el, words);
+        });
         this.incorrectWords.get(i).addWords(words); 
       }
     }.bind(this));
@@ -1017,7 +1025,7 @@ window.findAndReplaceDOMText = (function() {
         }
 
         // Create the replacement node:
-        var el = makeReplacementNode(range.match[0], matchIndex);
+        var el = makeReplacementNode(range.match[0], matchIndex, range.match[0]);
         node.parentNode.insertBefore(el, node);
         if (range.endNodeIndex < node.length) {
           // Add `after` text node (after the match)
@@ -1036,15 +1044,15 @@ window.findAndReplaceDOMText = (function() {
         // Replace startNode -> [innerNodes...] -> endNode (in that order)
         before = document.createTextNode(startNode.data.substring(0, range.startNodeIndex));
         after = document.createTextNode(endNode.data.substring(range.endNodeIndex));
-        var elA = makeReplacementNode(startNode.data.substring(range.startNodeIndex), matchIndex);
+        var elA = makeReplacementNode(startNode.data.substring(range.startNodeIndex), matchIndex, range.match[0]);
         var innerEls = [];
         for (var i = 0, l = range.innerNodes.length; i < l; ++i) {
           var innerNode = range.innerNodes[i];
-          var innerEl = makeReplacementNode(innerNode.data, matchIndex);
+          var innerEl = makeReplacementNode(innerNode.data, matchIndex, range.match[0]);
           innerNode.parentNode.replaceChild(innerEl, innerNode);
           innerEls.push(innerEl);
         }
-        var elB = makeReplacementNode(endNode.data.substring(0, range.endNodeIndex), matchIndex);
+        var elB = makeReplacementNode(endNode.data.substring(0, range.endNodeIndex), matchIndex, range.match[0]);
         startNode.parentNode.insertBefore(before, startNode);
         startNode.parentNode.insertBefore(elA, startNode);
         startNode.parentNode.removeChild(startNode);
