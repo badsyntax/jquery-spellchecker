@@ -41,7 +41,7 @@ The plugin has been tested and works with the following browsers:
 
 You can find simple usage examples in the downloadable package.
 
-* [Online demos](http://jquery-spellchecker.badsyntax.co)
+* [Fancy demos](http://jquery-spellchecker.badsyntax.co)
 * [Basic demos](http://jquery-spellchecker.badsyntax.co/basic)
 
 
