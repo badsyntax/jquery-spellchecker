@@ -31,7 +31,7 @@ The plugin has been tested and works with the following browsers:
 
 ## Download
 
-* [View Downloads](https://github.com/badsyntax/jquery-spellchecker/downloads) (Please always download the latest version.)
+* [View Downloads](http://jquery-spellchecker.badsyntax.co/downloads.html)
 
 ## Documentation
 
