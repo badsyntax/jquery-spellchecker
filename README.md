@@ -53,6 +53,10 @@ Testing is much appreciated. Please post any issue you find in the [issue tracke
 
 * View the [contribute documentation](https://github.com/badsyntax/jquery-spellchecker/blob/master/CONTRIBUTING.md) to learn how to contribute to the project.
 
+# Thanks
+
+This project would not be possible without the [findAndReplaceDOMText](https://github.com/padolsey/findAndReplaceDOMText) function written by [James Padolsey](https://github.com/padolsey).
+
 ## License
 
 Licensed under the MIT license.
