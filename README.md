@@ -31,7 +31,7 @@ The plugin has been tested and works with the following browsers:
 
 ## Download
 
-* [View Downloads](https://github.com/badsyntax/jquery-spellchecker/downloads) (Please always download the latest version.)
+* [View Downloads](http://jquery-spellchecker.badsyntax.co/downloads.html)
 
 ## Documentation
 
@@ -41,7 +41,7 @@ The plugin has been tested and works with the following browsers:
 
 You can find simple usage examples in the downloadable package.
 
-* [Online demos](http://jquery-spellchecker.badsyntax.co)
+* [Fancy demos](http://jquery-spellchecker.badsyntax.co)
 * [Basic demos](http://jquery-spellchecker.badsyntax.co/basic)
 
 
@@ -52,6 +52,10 @@ Testing is much appreciated. Please post any issue you find in the [issue tracke
 ## Contributing
 
 * View the [contribute documentation](https://github.com/badsyntax/jquery-spellchecker/blob/master/CONTRIBUTING.md) to learn how to contribute to the project.
+
+## Thanks
+
+This project would not be possible without the [findAndReplaceDOMText](https://github.com/padolsey/findAndReplaceDOMText) function written by [James Padolsey](https://github.com/padolsey).
 
 ## License
 
