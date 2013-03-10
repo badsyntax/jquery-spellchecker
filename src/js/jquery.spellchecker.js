@@ -57,6 +57,26 @@
     return $('<div />').html(text).html();
   };
 
+  var stripHTML = function(text) {
+
+    var elem = $('<div />').hide().appendTo('body').html(text);
+
+    // Add some whitespace after block and inline-block elements
+    elem.find('*').each(function() {
+
+      var e = $(this);
+      var display = e.css('display');
+      // Block elements
+      var isBlock = (display && (display !== 'inline'));
+      // Elements that are inline but behave like block
+      var isWordBreaking = $.inArray(this.nodeName, ['BR']) !== -1;
+
+      (isBlock || isWordBreaking) && e.after(" ");
+    });
+
+    return elem.text();
+  };
+
   RegExp.escape = function(text) {
     return text.replace(/[\-\[\]{}()*+?.,\^$|#\s]/g, "\\$&");
   };
@@ -447,17 +467,9 @@
 
   Parser.prototype.clean = function(text) {
 
-    text = '' + text; // Typecast to string
+    text = stripHTML(text || ''); // Strip any markup
     text = decode(text); // Decode HTML characters
     text = text.replace(/\xA0|\s+|(&nbsp;)/mg, ' '); // Convert whitespace
-
-    var wordBreakingTags = '(p|li)';
-    text = text.replace(new RegExp('<' + wordBreakingTags + '[^>]*>', 'gi'), ' '); // Strip word breaking tags
-    text = text.replace(new RegExp('<' + wordBreakingTags + '>', 'gi'), ' '); // Strip word breaking tags   
-    text = text.replace(new RegExp('</' + wordBreakingTags + ' [^>]*>', 'gi'), ' '); // Strip word breaking tags
-    text = text.replace(new RegExp('</' + wordBreakingTags + '>', 'gi'), ' '); // Strip word breaking tags
-
-    text = text.replace(new RegExp('<[^>]+>', 'g'), ''); // Strip other HTML tags
 
     var puncExpr = [
       '(^|\\s+)[' + punctuationChars + ']+',                        // punctuation(s) with leading whitespace(s)
@@ -510,8 +522,8 @@
   inherits(HtmlParser, Parser);
 
   HtmlParser.prototype.getText = function(text, textGetter) {
-    if (text && (text = $(text)).length) {
-      return this.clean(text.text());
+    if (text) {
+      return this.clean(text);
     }
     return $.map(this.elements, function(element) {
 
@@ -522,8 +534,7 @@
         .clone()
         .find('[class^="spellchecker-"]')
         .remove()
-        .end()
-        .text();
+        .end();
       }
       
       return this.clean(text);
@@ -583,21 +594,18 @@
   };
 
   HtmlParser.prototype.highlightWords = function(incorrectWords, element) {
+
     if (!incorrectWords.length) {
       return;
     }
 
-    this.incorrectWords = incorrectWords;
-    incorrectWords = $.map(incorrectWords, function(word) {
+    this.incorrectWords = $.map(incorrectWords, function(word) {
       return RegExp.escape(word);
     });
 
-    var regExp = '';
-    regExp += '([^' + letterChars + '])';
-    regExp += '(' + incorrectWords.join('|') + ')';
-    regExp += '(?=[^' + letterChars + '])';
+    var regExp = '(^|[^' + letterChars + '])(' + this.incorrectWords.join('|') + ')(?=[^' + letterChars + ']|$)';
 
-    this.replaceText(new RegExp(regExp, 'g'), element[0], this.highlightWordsHandler(incorrectWords), 2);
+    this.replaceText(new RegExp(regExp, 'g'), element[0], this.highlightWordsHandler(this.incorrectWords), 2);
   };
 
   HtmlParser.prototype.highlightWordsHandler = function(incorrectWords) {
@@ -888,17 +896,26 @@ window.findAndReplaceDOMText = (function() {
     if (node.nodeType === 3) {
       return node.data;
     }
+    if (node.nodeName === 'BR') {
+      return ' ';
+    }
 
+    var tmpNode = node;
     var txt = '';
 
     if (!!(node = node.firstChild)) do {
-            var wordBreakingNode = (node.tagName === 'P' || node.tagName === 'LI');
-            txt += ((wordBreakingNode ? ' ' : '') + _getText(node));
-
+      txt += _getText(node);
     } while (!!(node = node.nextSibling));
 
-    return txt;
+    var display = ((window.getComputedStyle)
+      ? window.getComputedStyle(tmpNode, null)
+      : tmpNode.currentStyle).display;
 
+    if (display && (display !== 'inline')) {
+      tmpNode.parentNode.insertBefore(document.createTextNode(' '), tmpNode.nextSibling);
+    }
+
+    return txt;
   }
 
   /** 
@@ -935,8 +952,6 @@ window.findAndReplaceDOMText = (function() {
           startNodeIndex = matchLocation[0] - atIndex;
         }
         atIndex += curNode.length;
-      } else if (curNode.tagName === 'P' || curNode.tagName === 'LI') {
-          atIndex += 1;
       }
 
       if (startNode && endNode) {

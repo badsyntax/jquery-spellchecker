@@ -289,7 +289,8 @@ describe("SpellChecker", function() {
       expect(replaced).toBe('Привет, ты в хорошо? Хотели бы Вы немного кокса? Нет, спасибо, я в хорошо!');
     });
   });  
-describe('Html parser', function() {
+
+  describe('Html parser', function() {
 
     var spellchecker, a, parser;
 
@@ -306,7 +307,7 @@ describe('Html parser', function() {
 
     it('Removes punctuation from text with tags', function() {
 
-      var text1 = '<p><b>Hello</b>, this "is" a-test.</p><P>How \'are\' you today?</P>';
+      var text1 = '<p><b>Hello</b>, this "is" a-test.</p><p>How \'are\' you today?</p>';
       var text2 = '<ul><li>test!</li><li>test.</li></ul>';
       var cleaned1 = parser.clean(text1);
       var cleaned2 = parser.clean(text2);
@@ -349,7 +350,96 @@ describe('Html parser', function() {
 
       expect(replaced).toBe('Привет, ты в хорошо? Хотели бы Вы немного кокса? Нет, спасибо, я в хорошо!');
     });
-  });  
+
+    describe('Highlight words', function() {
+      
+      // See: https://github.com/badsyntax/jquery-spellchecker/issues/26
+      it('Can highlight words correctly', function() {
+
+        var text = $('<p>tesst tesst tesst</p>');
+        var checked;
+
+        runs(function() {
+          newSpellChecker('html', text).check(text, function() {
+            checked = true;
+          });
+        });
+
+        waitsFor(function() {
+          return checked;
+        }, "Failed", 750);
+
+        runs(function() {
+          expect(text.html()).toBe('<span class="spellchecker-word-highlight">tesst</span> <span class="spellchecker-word-highlight">tesst</span> <span class="spellchecker-word-highlight">tesst</span>');
+        });
+      });
+
+      describe('With whitespace between nodes', function() {
+         it('Can highlight words correctly', function() {
+
+          var text = $('<p><span>This is the first sentensce</span> <span>This is the second sentence.</span></p>');
+          var checked;
+
+          runs(function() {
+            newSpellChecker('html', text).check(text, function() {
+              checked = true;
+            });
+          });
+
+          waitsFor(function() {
+            return checked;
+          }, "Failed", 750);
+
+          runs(function() {
+            expect(text.html()).toBe('<span>This is the first <span class="spellchecker-word-highlight">sentensce</span></span> <span>This is the second sentence.</span>');
+          });
+        });
+      })
+
+      describe('With no whitespace between nodes', function() {
+
+        it('Highlights words correctly with <br> separators', function() {
+
+          var text = $('<p><span>This is the first sentensce</span><br /><span>This is the second sentence.</span></p>');
+          var checked;
+
+          runs(function() {
+            newSpellChecker('html', text).check(text, function() {
+              checked = true;
+            });
+          });
+
+          waitsFor(function() {
+            return checked;
+          }, "Failed", 750);
+
+          runs(function() {
+            expect(text.html()).toBe('<span>This is the first <span class="spellchecker-word-highlight">sentensce</span></span><br> <span>This is the second sentence.</span>');
+          });
+        });
+
+        it('Highlights words correctly with block-level separators', function() {
+
+          var text = $('<div><p>This is the first sentensce</p><p>This is the second sentence.</p></div>');
+          var checked;
+
+          runs(function() {
+            newSpellChecker('html', text).check(text, function() {
+              checked = true;
+            });
+          });
+
+          waitsFor(function() {
+            return checked;
+          }, "Failed", 750);
+
+          runs(function() {
+            expect(text.html()).toBe('<p>This is the first <span class="spellchecker-word-highlight">sentensce</span></p>  <p>This is the second sentence.</p>  ');
+          });
+        });
+      });
+    });  
+  });
 
   describe('Public methods', function() {
 
