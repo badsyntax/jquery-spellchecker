@@ -450,7 +450,14 @@
     text = '' + text; // Typecast to string
     text = decode(text); // Decode HTML characters
     text = text.replace(/\xA0|\s+|(&nbsp;)/mg, ' '); // Convert whitespace
-    text = text.replace(new RegExp('<[^>]+>', 'g'), ''); // Strip HTML tags
+
+    var wordBreakingTags = '(p|li)';
+    text = text.replace(new RegExp('<' + wordBreakingTags + '[^>]*>', 'gi'), ' '); // Strip word breaking tags
+    text = text.replace(new RegExp('<' + wordBreakingTags + '>', 'gi'), ' '); // Strip word breaking tags   
+    text = text.replace(new RegExp('</' + wordBreakingTags + ' [^>]*>', 'gi'), ' '); // Strip word breaking tags
+    text = text.replace(new RegExp('</' + wordBreakingTags + '>', 'gi'), ' '); // Strip word breaking tags
+
+    text = text.replace(new RegExp('<[^>]+>', 'g'), ''); // Strip other HTML tags
 
     var puncExpr = [
       '(^|\\s+)[' + punctuationChars + ']+',                        // punctuation(s) with leading whitespace(s)
@@ -885,7 +892,9 @@ window.findAndReplaceDOMText = (function() {
     var txt = '';
 
     if (!!(node = node.firstChild)) do {
-      txt += _getText(node);
+            var wordBreakingNode = (node.tagName === 'P' || node.tagName === 'LI');
+            txt += ((wordBreakingNode ? ' ' : '') + _getText(node));
+
     } while (!!(node = node.nextSibling));
 
     return txt;
@@ -926,6 +935,8 @@ window.findAndReplaceDOMText = (function() {
           startNodeIndex = matchLocation[0] - atIndex;
         }
         atIndex += curNode.length;
+      } else if (curNode.tagName === 'P' || curNode.tagName === 'LI') {
+          atIndex += 1;
       }
 
       if (startNode && endNode) {
