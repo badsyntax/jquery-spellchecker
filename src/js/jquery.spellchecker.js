@@ -71,7 +71,9 @@
       // Elements that are inline but behave like block
       var isWordBreaking = $.inArray(this.nodeName, ['BR']) !== -1;
 
-      (isBlock || isWordBreaking) && e.after(" ");
+      if (isBlock || isWordBreaking) {
+        e.after(" ");
+      }
     });
 
     return elem.text();
@@ -549,7 +551,7 @@
   HtmlParser.prototype.replaceWord = function(oldWord, replacement, element) {
 
     try {
-      window.findAndReplaceDOMText.revert();
+      window.findAndReplaceDOMText.revert();  
     } catch(e) {}
 
     var regExp = new RegExp('(^|[^' + letterChars + '])(' + RegExp.escape(oldWord) + ')(?=[^' + letterChars + ']|$)', 'g');
@@ -907,9 +909,9 @@ window.findAndReplaceDOMText = (function() {
       txt += _getText(node);
     } while (!!(node = node.nextSibling));
 
-    var display = ((window.getComputedStyle)
-      ? window.getComputedStyle(tmpNode, null)
-      : tmpNode.currentStyle).display;
+    var display = ((window.getComputedStyle) ? 
+      window.getComputedStyle(tmpNode, null) : 
+      tmpNode.currentStyle).display;
 
     if (display && (display !== 'inline')) {
       tmpNode.parentNode.insertBefore(document.createTextNode(' '), tmpNode.nextSibling);

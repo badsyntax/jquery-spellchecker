@@ -394,7 +394,7 @@ describe("SpellChecker", function() {
             expect(text.html()).toBe('<span>This is the first <span class="spellchecker-word-highlight">sentensce</span></span> <span>This is the second sentence.</span>');
           });
         });
-      })
+      });
 
       describe('With no whitespace between nodes', function() {
 
