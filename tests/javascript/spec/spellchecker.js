@@ -340,7 +340,7 @@ describe("SpellChecker", function() {
       parser.replaceWord('ok', 'good', text);
       var replaced = text.text();
 
-      expect(replaced).toBe('good 1?good 2!good 3?good 4!');
+      expect($.trim(replaced)).toBe('good 1?\ngood 2!\ngood 3?\ngood 4!');
     });
 
     it('Replaces a Unicode word multiple times in a node', function() {
@@ -348,7 +348,7 @@ describe("SpellChecker", function() {
       parser.replaceWord('порядке', 'хорошо', text);
       var replaced = text.text();
 
-      expect(replaced).toBe('Привет, ты в хорошо? Хотели бы Вы немного кокса? Нет, спасибо, я в хорошо!');
+      expect($.trim(replaced)).toBe('Привет, ты в хорошо? Хотели бы Вы немного кокса? Нет, спасибо, я в хорошо!');
     });
 
     describe('Highlight words', function() {
@@ -414,7 +414,7 @@ describe("SpellChecker", function() {
           }, "Failed", 750);
 
           runs(function() {
-            expect(text.html()).toBe('<span>This is the first <span class="spellchecker-word-highlight">sentensce</span></span><br> <span>This is the second sentence.</span>');
+            expect(text.html()).toBe('<span>This is the first <span class="spellchecker-word-highlight">sentensce</span></span><br>\n<span>This is the second sentence.</span>');
           });
         });
 
@@ -434,7 +434,7 @@ describe("SpellChecker", function() {
           }, "Failed", 750);
 
           runs(function() {
-            expect(text.html()).toBe('<p>This is the first <span class="spellchecker-word-highlight">sentensce</span></p>  <p>This is the second sentence.</p>  ');
+            expect($.trim(text.html())).toBe('<p>This is the first <span class="spellchecker-word-highlight">sentensce</span></p>\n<p>This is the second sentence.</p>');
           });
         });
       });
