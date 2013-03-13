@@ -571,7 +571,7 @@
     var replaceFill;
     var c;
 
-    return function(fill, i) {
+    return function(fill, i, word, doc) {
 
       // Reset the replacement for each match
       if (i !== c) {
@@ -589,7 +589,7 @@
         replaceFill += replacement;
       }
 
-      return document.createTextNode(replaceFill);
+      return doc.createTextNode(replaceFill);
     };
   };
 
@@ -613,12 +613,11 @@
     var c;
     var replaceElement;
 
-    return function(fill, i, word) {
+    return function(fill, i, word, doc) {
 
       // Replacement node
-      var span = $('<span />', {
-        'class': pluginName + '-word-highlight'
-      });
+      var spanTag = doc.createElement('span');
+      var span = $(spanTag).addClass(pluginName + '-word-highlight');
 
       // If we have a new match
       if (i !== c) {
@@ -846,7 +845,7 @@
     function findAndReplaceDOMText(regex, node, replacementNode, captureGroup) {
 
       var m, matches = [], text = _getText(node);
-      var replaceFn = _genReplacer(replacementNode);
+      var replaceFn = _genReplacer(replacementNode, node);
 
       if (!text) { return; }
 
@@ -1005,21 +1004,22 @@
      * Generates the actual replaceFn which splits up text nodes
      * and inserts the replacement element.
      */
-    function _genReplacer(nodeName) {
+    function _genReplacer(nodeName, node) {
 
       reverts = [];
 
       var makeReplacementNode;
+      var doc = node.ownerDocument;
 
       if (typeof nodeName !== 'function') {
-        var stencilNode = nodeName.nodeType ? nodeName : document.createElement(nodeName);
+        var stencilNode = nodeName.nodeType ? nodeName : doc.createElement(nodeName);
         makeReplacementNode = function(fill) {
-          var clone = document.createElement('div'),
+          var clone = doc.createElement('div'),
               el;
           clone.innerHTML = stencilNode.outerHTML || new window.XMLSerializer().serializeToString(stencilNode);
           el = clone.firstChild;
           if (fill) {
-            el.appendChild(document.createTextNode(fill));
+            el.appendChild(doc.createTextNode(fill));
           }
           return el;
         };
@@ -1038,16 +1038,16 @@
           var node = startNode;
           if (range.startNodeIndex > 0) {
             // Add `before` text node (before the match)
-            before = document.createTextNode(node.data.substring(0, range.startNodeIndex));
+            before = doc.createTextNode(node.data.substring(0, range.startNodeIndex));
             node.parentNode.insertBefore(before, node);
           }
 
           // Create the replacement node:
-          var el = makeReplacementNode(range.match[0], matchIndex, range.match[0]);
+          var el = makeReplacementNode(range.match[0], matchIndex, range.match[0], doc);
           node.parentNode.insertBefore(el, node);
           if (range.endNodeIndex < node.length) {
             // Add `after` text node (after the match)
-            after = document.createTextNode(node.data.substring(range.endNodeIndex));
+            after = doc.createTextNode(node.data.substring(range.endNodeIndex));
             node.parentNode.insertBefore(after, node);
           }
           node.parentNode.removeChild(node);
@@ -1060,17 +1060,17 @@
           return el;
         } else {
           // Replace startNode -> [innerNodes...] -> endNode (in that order)
-          before = document.createTextNode(startNode.data.substring(0, range.startNodeIndex));
-          after = document.createTextNode(endNode.data.substring(range.endNodeIndex));
-          var elA = makeReplacementNode(startNode.data.substring(range.startNodeIndex), matchIndex, range.match[0]);
+          before = doc.createTextNode(startNode.data.substring(0, range.startNodeIndex));
+          after = doc.createTextNode(endNode.data.substring(range.endNodeIndex));
+          var elA = makeReplacementNode(startNode.data.substring(range.startNodeIndex), matchIndex, range.match[0], doc);
           var innerEls = [];
           for (var i = 0, l = range.innerNodes.length; i < l; ++i) {
             var innerNode = range.innerNodes[i];
-            var innerEl = makeReplacementNode(innerNode.data, matchIndex, range.match[0]);
+            var innerEl = makeReplacementNode(innerNode.data, matchIndex, range.match[0], doc);
             innerNode.parentNode.replaceChild(innerEl, innerNode);
             innerEls.push(innerEl);
           }
-          var elB = makeReplacementNode(endNode.data.substring(0, range.endNodeIndex), matchIndex, range.match[0]);
+          var elB = makeReplacementNode(endNode.data.substring(0, range.endNodeIndex), matchIndex, range.match[0], doc);
           startNode.parentNode.insertBefore(before, startNode);
           startNode.parentNode.insertBefore(elA, startNode);
           startNode.parentNode.removeChild(startNode);
