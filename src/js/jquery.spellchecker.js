@@ -649,7 +649,8 @@
     Events.call(this);
 
     this.elements = $(elements).attr('spellcheck', 'false');
-    this.config = $.extend(true, defaultConfig, config);
+    var defaultConfigCopy = $.extend(true, {}, defaultConfig);
+    this.config = $.extend(true, defaultConfigCopy, config);
 
     this.setupWebService();
     this.setupParser();
