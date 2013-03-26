@@ -11,7 +11,7 @@ The current version of the plugin is v0.2.4 Beta.
 * HTML parsing (for using the spellchecker within WSYIWYG editors)
 * Text parsing (for using the spellchecker on form fields)
 * Multiple fields
-* Multiple PHP back-end drivers (Enchant, PSpell, Google)
+* Multiple PHP back-end drivers (Enchant, PSpell, Google, Yandex)
 * Friendly API
 * Event based
 * MIT licensed
