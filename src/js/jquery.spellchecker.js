@@ -756,17 +756,43 @@
 
       var incorrectWords = data.data;
       var outcome = 'success';
+      var already_ignored_array = [];
+      var already_ignored_string = sessionStorage.ignoredWords;
+      var final_mispels = [];
+      final_mispels[0] = [];
 
+      // Have we already chosen to ignore this word?
+      if(already_ignored_string) {
+          already_ignored_array = JSON.parse(already_ignored_string); 
+      } 
+
+       // Do we have mispels?
       $.each(incorrectWords, function(i, words) {
+
         if (words.length) {
-          outcome = 'fail';
-          return false;
+            
+            $.each(words, function(key, word) {
+                
+                // Is the mispelt word in our array of ignored words?
+                var ignored_word_index = $.inArray(word , already_ignored_array);
+
+                if(ignored_word_index === -1) {
+                    //console.log("Add " + word + " at " + key + " from the array at position " + i + " to our final list" );
+                    final_mispels[0].push(word);
+                } 
+            }); 
+
+            /// Are there still words left in the incorrectWords array?
+            if(final_mispels[0].length) {
+                 outcome = 'fail';
+                 return false;  
+            }
         }
       });
 
       this.trigger('check.complete');
-      this.trigger('check.' + outcome, incorrectWords);
-      this.trigger(callback, incorrectWords);
+      this.trigger('check.' + outcome, final_mispels);
+      this.trigger(callback, final_mispels);
 
     }.bind(this);
   };
@@ -792,7 +818,34 @@
 
   SpellChecker.prototype.onIgnoreWord = function(e, word, element) {
     e.preventDefault();
-    this.replaceWord(this.incorrectWord, this.incorrectWord);
+   
+    // What word do we want to ignore?
+    var wordToIgnore = this.incorrectWord;
+
+    // Have we already ignored this word?
+    var already_ignored_string = sessionStorage.ignoredWords;
+    var already_ignored_array = [];
+
+    // Have we already chosen to ignore this word?
+    if(already_ignored_string) {
+       
+        already_ignored_array = JSON.parse(already_ignored_string); 
+
+        if($.inArray(wordToIgnore, already_ignored_array) === -1) {
+            already_ignored_array.push(wordToIgnore);
+        } 
+
+    } 
+    // This is the first word we're adding.
+    else {
+        already_ignored_array.push(wordToIgnore);
+    }
+
+    // Pop it in the DOM session storage
+    sessionStorage.setItem("ignoredWords", JSON.stringify(already_ignored_array));
+    
+    // Remove the word from the list of miss-spells
+    this.replaceWord(wordToIgnore, wordToIgnore);
   };
 
   SpellChecker.prototype.onIncorrectWordSelect = function(e, word, element, incorrectWords) {
