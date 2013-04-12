@@ -864,8 +864,13 @@ window.findAndReplaceDOMText = (function() {
     if (!text) { return; }
 
     //MODIFIED BY Kirk Spencer
+    var firstChar = text2.replace(/^\s+|\s+$/g, '')[0];
+    var paddingLength = text.indexOf(firstChar);
+    text2 = text.substr(0, paddingLength) + text2;
+
     text = " " + text + " ";
     text2 = " " + text2 + " ";
+
     if (regex.global) {
       while (!!(m = regex.exec(text2))) {
         matches.push(_getMatchIndexes(m, text, text2));
