@@ -870,14 +870,15 @@ window.findAndReplaceDOMText = (function() {
 
     text = " " + text + " ";
     text2 = " " + text2 + " ";
+    whitespaces = _getWhitespaces(text);
 
     if (regex.global) {
       while (!!(m = regex.exec(text2))) {
-        matches.push(_getMatchIndexes(m, text, text2));
+        matches.push(_getMatchIndexes(m, text, text2, whitespaces));
       }
     } else {
       m = text2.match(regex);
-      matches.push(_getMatchIndexes(m, text, text2));
+      matches.push(_getMatchIndexes(m, text, text2, whitespaces));
     }
     //End MODIFIED BY Kirk Spencer
 
@@ -886,19 +887,30 @@ window.findAndReplaceDOMText = (function() {
     }
   }
 
+  //MODIFIED BY Kirk Spencer
+  function _getWhitespaces(text) {
+    var whitespaceRegex = /\s+/g;
+    var whitespaces = [];
+    while (!!(match = whitespaceRegex.exec(text))) {
+      whitespaces.push({ value: match[0], position: match.index });
+    }
+    return whitespaces;
+  }
+
   /**
    * Gets the start and end indexes of a match
    */
-  //MODIFIED BY Kirk Spencer
-  function _getMatchIndexes(m, text, text2) {
+  function _getMatchIndexes(m, text, text2, whitespaces) {
     var length = m.index;
     var preText = text2.substr(0, length);
+    var whitespaceRegex = /\s+/g;
+    preText = preText.replace(whitespaceRegex, '');
+    length = whitespaces.length;
     for (var i = 0; i < length; i++) {
-      var char = preText.substr(i, 1);
-      if (char != text.substr(i, 1)) {
-        preText = preText.substring(0, i) + preText.substring(i + 1, preText.len);
-        length--;
-        i--
+      if (whitespaces[i].position <= preText.length) {
+        preText = [preText.slice(0, whitespaces[i].position), whitespaces[i].value, preText.slice(whitespaces[i].position)].join('');
+      } else {
+        break;
       }
     }
     var index = preText.length - 1;
