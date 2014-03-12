@@ -106,10 +106,18 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
 
     var t = this;
 
+    var win = $(window);
+	
     return function() {
 
       var ed = t.editor;
       var word = (this.wordElement.data('firstElement') || this.wordElement)[0];
+	    var element = this.wordElement.data('firstElement') || this.wordElement;
+      var offset = element.offset();
+      var boxOffset = this.config.suggestBox.offset;
+	    var containerHeight = this.container.outerHeight();
+	    var positionAbove = (offset.top - containerHeight - boxOffset);
+      var positionBelow = (offset.top + element.outerHeight() + boxOffset);
 
       var p1 = $(ed.container.$).find('iframe').offset();
       var p2 = $(ed.container.$).offset();
@@ -119,7 +127,11 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
       var top = p3.top + p2.top + (p1.top - p2.top) + word.offsetHeight;
 
       top -= $(t.editorWindow).scrollTop();
-
+	
+		  if (win.height() + win.scrollTop() < positionBelow + containerHeight) {
+			  top = positionAbove;
+		  }
+		
       this.container.css({ 
         top: top, 
         left: left  
