@@ -110,27 +110,26 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
 	
     return function() {
 
-      var ed = t.editor;
-      var word = (this.wordElement.data('firstElement') || this.wordElement)[0];
-	    var element = this.wordElement.data('firstElement') || this.wordElement;
-      var offset = element.offset();
-      var boxOffset = this.config.suggestBox.offset;
-	    var containerHeight = this.container.outerHeight();
-	    var positionAbove = (offset.top - containerHeight - boxOffset);
-      var positionBelow = (offset.top + element.outerHeight() + boxOffset);
+      	var ed = t.editor;
+	var word = (this.wordElement.data('firstElement') || this.wordElement)[0];
+	var element = this.wordElement.data('firstElement') || this.wordElement;
+	var offset = element.offset();
+	var boxOffset = this.config.suggestBox.offset;
+	var containerHeight = this.container.outerHeight();
 
-      var p1 = $(ed.container.$).find('iframe').offset();
-      var p2 = $(ed.container.$).offset();
-      var p3 = $(word).offset();
+	var p1 = $(ed.container.$).find('iframe').offset();
+	var p2 = $(ed.container.$).offset();
+	var p3 = $(word).offset();
 
-      var left = p3.left + p2.left;
-      var top = p3.top + p2.top + (p1.top - p2.top) + word.offsetHeight;
+	var left = p3.left + p2.left;
+	var top = p3.top + p2.top + (p1.top - p2.top) + word.offsetHeight;
+	var positionAbove =( p3.top + p2.top - word.offsetHeight ) - containerHeight;
 
-      top -= $(t.editorWindow).scrollTop();
+	top -= $(t.editorWindow).scrollTop();
 	
-		  if (win.height() + win.scrollTop() < positionBelow + containerHeight) {
-			  top = positionAbove;
-		  }
+	if (win.height() + win.scrollTop() < top + containerHeight) {
+		top = positionAbove;
+	}
 		
       this.container.css({ 
         top: top, 
