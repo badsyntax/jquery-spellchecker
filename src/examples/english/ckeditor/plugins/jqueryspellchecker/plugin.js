@@ -88,7 +88,11 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
     t.config.getText = function() {
       return $('<div />').append(t.editor.getData()).text();
     };
-
+    
+    if (t.editor.config.forceSpellingLanguage) {
+    	t.config.lang = t.editor.config.forceSpellingLanguage;
+    }
+    
     t.spellchecker = new $.SpellChecker(t.editor.document.$.body, this.config);
 
     t.spellchecker.on('check.success', function() {
