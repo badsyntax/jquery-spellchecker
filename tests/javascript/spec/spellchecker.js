@@ -289,6 +289,67 @@ describe("SpellChecker", function() {
       expect(replaced).toBe('Привет, ты в хорошо? Хотели бы Вы немного кокса? Нет, спасибо, я в хорошо!');
     });
   });  
+describe('Html parser', function() {
+
+    var spellchecker, a, parser;
+
+    beforeEach(function () {
+      a = $('<a id="test1" />').appendTo('body');
+      spellchecker = newSpellChecker('html', a);
+      parser = spellchecker.parser;
+    });
+
+    afterEach(function() {
+      spellchecker.destroy();
+      a.remove();
+    });
+
+    it('Removes punctuation from text with tags', function() {
+
+      var text1 = '<p><b>Hello</b>, this "is" a-test.</p><P>How \'are\' you today?</P>';
+      var text2 = '<ul><li>test!</li><li>test.</li></ul>';
+      var cleaned1 = parser.clean(text1);
+      var cleaned2 = parser.clean(text2);
+      
+      expect(cleaned1).toBe('Hello this is a-test How are you today');
+      expect(cleaned2).toBe('test test');
+    });
+
+    it('Removes numbers from text with tags', function() {
+
+      var text1 = '<p><b>Hello</b>,</p><p>123,</p><p>this is a-test. \'456\' How are you today?</p>';
+      var text2 = '<ul><li>test 1</li><li>test 2</li><ul>';
+      var cleaned1 = parser.clean(text1);
+      var cleaned2 = parser.clean(text2);
+
+      expect(cleaned1).toBe('Hello this is a-test How are you today');
+      expect(cleaned2).toBe('test test');
+    });
+
+    it('Replaces a word multiple times in a simple node', function() {
+      var text = $('<div>are you ok?</div>');
+      parser.replaceWord('ok', 'good', text);
+      var replaced = text.text();
+
+      expect(replaced).toBe('are you good?');
+    });
+
+    it('Replaces a word multiple times in a node', function () {
+      var text = $('<div><p class="someClass">o<b>k</b> 1?</p><P>ok 2!</P><ul><li someAttribute=true>ok 3?</li><LI><u>ok</u> 4!</LI></ul></div>');
+      parser.replaceWord('ok', 'good', text);
+      var replaced = text.text();
+
+      expect(replaced).toBe('good 1?good 2!good 3?good 4!');
+    });
+
+    it('Replaces a Unicode word multiple times in a node', function() {
+      var text = $('<div><p>Привет, ты в порядке? Хотели бы Вы немного кокса? Нет, спасибо, я в порядке!</p></div>');
+      parser.replaceWord('порядке', 'хорошо', text);
+      var replaced = text.text();
+
+      expect(replaced).toBe('Привет, ты в хорошо? Хотели бы Вы немного кокса? Нет, спасибо, я в хорошо!');
+    });
+  });  
 
   describe('Public methods', function() {
 
