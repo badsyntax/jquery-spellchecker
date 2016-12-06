@@ -1,0 +1,40 @@
+{
+  "name": "spellchecker",
+  "title": "jQuery Spellchecker",
+  "description": "A lightweight jQuery plugin that can check the spelling of text within a form field or DOM tree",
+  "version": "0.2.4",
+  "homepage": "https://github.com/badsyntax/jquery-spellchecker",
+  "author": {
+    "name": "Richard Willis",
+    "email": "willis.rh@gmail.com",
+    "url": "http://badsyntax.co"
+  },
+  "maintainers": [
+    {
+      "name": "Richard Willis",
+      "email": "willis.rh@gmail.com",
+      "url": "http://badsyntax.co"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/badsyntax/jquery-spellchecker.git"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/badsyntax/jquery-spellchecker/blob/master/LICENSE-MIT"
+    }
+  ],
+  "homepage": "https://github.com/badsyntax/jquery-spellchecker",
+  "bugs": "https://github.com/badsyntax/jquery-spellchecker/issues",
+  "docs": "https://github.com/badsyntax/jquery-spellchecker/wiki/Documentation",
+  "demo": "http://jquery-spellchecker.badsyntax.co",
+  "dependencies": {
+    "jquery": ">=1.5"
+  },
+  "keywords": [
+    "spelling",
+    "spell"
+  ]
+}

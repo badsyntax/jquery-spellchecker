@@ -3,7 +3,7 @@
 module.exports = function(grunt) {
 
   grunt.initConfig({
-    pkg: '<json:jquery.spellchecker.json>',
+    pkg: '<json:spellchecker.jquery.json>',
     meta: {
       banner: '/*\n * <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
         '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -13,8 +13,8 @@ module.exports = function(grunt) {
     },
     concat: {
       dist: {
-        src: ['<banner:meta.banner>', '<file_strip_banner:src/js/<%= pkg.name %>.js>', '<banner:meta.test'],
-        dest: 'dist/js/<%= pkg.name %>.js'
+        src: ['<banner:meta.banner>', '<file_strip_banner:src/js/jquery.<%= pkg.name %>.js>', '<banner:meta.test'],
+        dest: 'dist/js/jquery.<%= pkg.name %>.js'
       }
     },
     copy: {
@@ -31,7 +31,7 @@ module.exports = function(grunt) {
       dist: 
         {
           src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
-          dest: 'dist/js/<%= pkg.name %>.min.js'
+          dest: 'dist/js/jquery.<%= pkg.name %>.min.js'
         }
     },
     mincss: {

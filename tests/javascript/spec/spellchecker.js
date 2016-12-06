@@ -290,6 +290,157 @@ describe("SpellChecker", function() {
     });
   });  
 
+  describe('Html parser', function() {
+
+    var spellchecker, a, parser;
+
+    beforeEach(function () {
+      a = $('<a id="test1" />').appendTo('body');
+      spellchecker = newSpellChecker('html', a);
+      parser = spellchecker.parser;
+    });
+
+    afterEach(function() {
+      spellchecker.destroy();
+      a.remove();
+    });
+
+    it('Removes punctuation from text with tags', function() {
+
+      var text1 = '<p><b>Hello</b>, this "is" a-test.</p><p>How \'are\' you today?</p>';
+      var text2 = '<ul><li>test!</li><li>test.</li></ul>';
+      var cleaned1 = parser.clean(text1);
+      var cleaned2 = parser.clean(text2);
+      
+      expect(cleaned1).toBe('Hello this is a-test How are you today');
+      expect(cleaned2).toBe('test test');
+    });
+
+    it('Removes numbers from text with tags', function() {
+
+      var text1 = '<p><b>Hello</b>,</p><p>123,</p><p>this is a-test. \'456\' How are you today?</p>';
+      var text2 = '<ul><li>test 1</li><li>test 2</li><ul>';
+      var cleaned1 = parser.clean(text1);
+      var cleaned2 = parser.clean(text2);
+
+      expect(cleaned1).toBe('Hello this is a-test How are you today');
+      expect(cleaned2).toBe('test test');
+    });
+
+    it('Replaces a word multiple times in a simple node', function() {
+      var text = $('<div>are you ok?</div>');
+      parser.replaceWord('ok', 'good', text);
+      var replaced = text.text();
+
+      expect(replaced).toBe('are you good?');
+    });
+
+    it('Replaces a word multiple times in a node', function () {
+      var text = $('<div><p class="someClass">o<b>k</b> 1?</p><P>ok 2!</P><ul><li someAttribute=true>ok 3?</li><LI><u>ok</u> 4!</LI></ul></div>');
+      parser.replaceWord('ok', 'good', text);
+      var replaced = text.text();
+
+      expect($.trim(replaced)).toBe('good 1?\ngood 2!\ngood 3?\ngood 4!');
+    });
+
+    it('Replaces a Unicode word multiple times in a node', function() {
+      var text = $('<div><p>Привет, ты в порядке? Хотели бы Вы немного кокса? Нет, спасибо, я в порядке!</p></div>');
+      parser.replaceWord('порядке', 'хорошо', text);
+      var replaced = text.text();
+
+      expect($.trim(replaced)).toBe('Привет, ты в хорошо? Хотели бы Вы немного кокса? Нет, спасибо, я в хорошо!');
+    });
+
+    describe('Highlight words', function() {
+      
+      // See: https://github.com/badsyntax/jquery-spellchecker/issues/26
+      it('Can highlight words correctly', function() {
+
+        var text = $('<p>tesst tesst tesst</p>');
+        var checked;
+
+        runs(function() {
+          newSpellChecker('html', text).check(text, function() {
+            checked = true;
+          });
+        });
+
+        waitsFor(function() {
+          return checked;
+        }, "Failed", 750);
+
+        runs(function() {
+          expect(text.html()).toBe('<span class="spellchecker-word-highlight">tesst</span> <span class="spellchecker-word-highlight">tesst</span> <span class="spellchecker-word-highlight">tesst</span>');
+        });
+      });
+
+      describe('With whitespace between nodes', function() {
+         it('Can highlight words correctly', function() {
+
+          var text = $('<p><span>This is the first sentensce</span> <span>This is the second sentence.</span></p>');
+          var checked;
+
+          runs(function() {
+            newSpellChecker('html', text).check(text, function() {
+              checked = true;
+            });
+          });
+
+          waitsFor(function() {
+            return checked;
+          }, "Failed", 750);
+
+          runs(function() {
+            expect(text.html()).toBe('<span>This is the first <span class="spellchecker-word-highlight">sentensce</span></span> <span>This is the second sentence.</span>');
+          });
+        });
+      });
+
+      describe('With no whitespace between nodes', function() {
+
+        it('Highlights words correctly with <br> separators', function() {
+
+          var text = $('<p><span>This is the first sentensce</span><br /><span>This is the second sentence.</span></p>');
+          var checked;
+
+          runs(function() {
+            newSpellChecker('html', text).check(text, function() {
+              checked = true;
+            });
+          });
+
+          waitsFor(function() {
+            return checked;
+          }, "Failed", 750);
+
+          runs(function() {
+            expect(text.html()).toBe('<span>This is the first <span class="spellchecker-word-highlight">sentensce</span></span><br>\n<span>This is the second sentence.</span>');
+          });
+        });
+
+        it('Highlights words correctly with block-level separators', function() {
+
+          var text = $('<div><p>This is the first sentensce</p><p>This is the second sentence.</p></div>');
+          var checked;
+
+          runs(function() {
+            newSpellChecker('html', text).check(text, function() {
+              checked = true;
+            });
+          });
+
+          waitsFor(function() {
+            return checked;
+          }, "Failed", 750);
+
+          runs(function() {
+            expect($.trim(text.html())).toBe('<p>This is the first <span class="spellchecker-word-highlight">sentensce</span></p>\n<p>This is the second sentence.</p>');
+          });
+        });
+      });
+    });  
+  });
+
   describe('Public methods', function() {
 
     it('Replaces a word in a string of text', function() {
