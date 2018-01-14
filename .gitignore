@@ -1,2 +1,13 @@
+node_modules/
+npm-debug.log
+package-lock.json
+.grunt
 _SpecRunner.html
+
+/vendor
+composer.phar
 composer.lock
+.DS_Store
+Thumbs.db
+
+.idea/
