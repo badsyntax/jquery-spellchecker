@@ -1,4 +1,5 @@
-<?php
+<?php namespace SpellChecker;
+
 /**
  * Spellchecker request class
  *
@@ -7,40 +8,35 @@
  * @copyright  (c) Richard Willis
  * @license    https://github.com/badsyntax/jquery-spellchecker/blob/master/LICENSE-MIT
  */
-
-namespace SpellChecker;
-
 class Request {
 
-	public function __construct()
+	public function __construct($inputs = array(), $response = 'static::send_response', $config = array())
 	{
-		if (!self::post())
-		{
+		if (empty($inputs))
+			$inputs = $_POST;
+
+		if (empty($inputs['action']))
 			return;
-		}
-		$this->driver = self::post('driver');
-		$this->action = self::post('action');
-		$this->lang = self::post('lang');
-		$this->execute_action();
+
+		$data = static::execute_action($inputs, $config);
+		call_user_func($response, $data);
 	}
 
-	public function execute_action()
+	public static function execute_action($inputs = array(), $config = array())
 	{
-		$class = '\SpellChecker\Driver\\' . ucfirst(strtolower($this->driver));
-		$driver = new $class(array('lang' => $this->lang));
-		$driver->{$this->action}();
+		$driver = isset($inputs['driver']) ? $inputs['driver'] : 'PSpell';
+		$lang = isset($inputs['lang']) ? $inputs['lang'] : 'en';
+
+		$class = '\SpellChecker\Driver\\' . ucfirst(strtolower($driver));
+		$driver = new $class(array_merge($config, compact('lang')));
+
+		return $driver->{$inputs['action']}($inputs);
 	}
 
-	public static function post($key = NULL)
+	public static function send_response($data)
 	{
-		if ($key === NULL)
-		{
-			return $_POST;
-		}
-		if (!$_POST)
-		{
-			return '';
-		}
-		return isset($_POST[$key]) ? $_POST[$key] : '';
+		header('Content-type: application/json');
+
+		echo json_encode($data);
 	}
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * jQuery Spellchecker - CKeditor Plugin - v0.2.4
  * https://github.com/badsyntax/jquery-spellchecker
  * Copyright (c) 2012 Richard Willis; Licensed MIT
@@ -10,7 +10,7 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
     lang: 'en',
     parser: 'html',
     webservice: {
-      path: '/webservices/php/SpellChecker.php',
+      path: '/src/webservices/php/SpellChecker.php',
       driver: 'pspell'
     },
     suggestBox: {

@@ -1,7 +1,16 @@
 {
   "name": "badsyntax/jquery-spellchecker",
   "description": "A jQuery Spellchecker plugin",
-  "keywords" : ["spellcheck","spellchecker","jquery spellcheck","jquery spellchecker","spellcheck plugin","spellchecker plugin","php spellcheck","php spellchecker"],
+  "keywords": [
+    "spellcheck",
+    "spellchecker",
+    "jquery spellcheck",
+    "jquery spellchecker",
+    "spellcheck plugin",
+    "spellchecker plugin",
+    "php spellcheck",
+    "php spellchecker"
+  ],
   "license": "MIT",
   "authors": [
     {

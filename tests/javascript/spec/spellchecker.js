@@ -9,7 +9,7 @@ describe("SpellChecker", function() {
       lang: 'en',
       parser: parser,
       webservice: {
-        path: 'http://jquery-spellchecker/src/webservices/php/SpellChecker.php',
+        path: 'http://localhost:8000/src/webservices/php/SpellChecker.php',
         driver: 'pspell'
       }
     });

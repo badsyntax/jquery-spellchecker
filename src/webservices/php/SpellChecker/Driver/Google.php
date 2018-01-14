@@ -1,4 +1,5 @@
-<?php
+<?php namespace SpellChecker\Driver;
+
 /**
  * Spellchecker Google driver class
  * !! Curl is required to use the google spellchecker API !!
@@ -8,88 +9,97 @@
  * @copyright  (c) Richard Willis
  * @license    https://github.com/badsyntax/jquery-spellchecker/blob/master/LICENSE-MIT
  */
-
-namespace SpellChecker\Driver;
-
 class Google extends \SpellChecker\Driver
 {
 	protected $_default_config = array(
+		'encoding' => 'utf-8',
 		'lang' => 'en'
 	);
 
-	public function get_word_suggestions($word = NULL)
+	public function __construct($config = array())
+	{
+		parent::__construct($config);
+
+		if (!function_exists('curl_init')) {
+			throw new \Exception('cURL is not available.');
+		}
+	}
+
+	protected function get_word_suggestions($word)
 	{
 		$matches = $this->get_matches($word);
 
-		$suggestions = array();
-
-		if (isset($matches[0][3]) AND trim($matches[0][3]) !== '')
-		{
-			$suggestions = explode("\t", $matches[0][3]);
+		if (isset($matches[0][3]) && ($s = trim($matches[0][3]))) {
+			return explode("\t", $s);
 		}
 
-		return $suggestions;
+		return array();
 	}
 
-	public function get_incorrect_words()
+	public function get_incorrect_words($inputs = array())
 	{
-		$texts = (array) \SpellChecker\Request::post('text');
+		$texts = isset($inputs['text']) ? (array)$inputs['text'] : array();
 
 		$response = array();
-
-		foreach($texts as $text)
-		{    
+		foreach ($texts as $text) {
 			$words = $this->get_matches($text);
 
 			$incorrect_words = array();
-
-			foreach($words as $word)
-			{
-				$incorrect_words[] = mb_substr($text, $word[0], $word[1], 'utf-8');
+			foreach ($words as $word) {
+				$incorrect_words[] = mb_substr($text, $word[0], $word[1], $this->_config['encoding']);
 			}
 
-			$response[] = $incorrect_words;
+			$response[] = array_unique(array_filter($incorrect_words));
 		}
 
-		$this->send_data('success', $response);
+		return $this->send_data(array_filter($response), 'success');
 	}
 
-	public function check_word($word = NULL) {}
+	protected function is_incorrect_word($word)
+	{
+	}
 
 	private function get_matches($text)
 	{
-		$xml_response = '';
-		$url = 'https://www.google.com/tbproxy/spell?lang='.$this->_config['lang'];
-
-		$body = '<?xml version="1.0" encoding="utf-8" ?>';
-		$body .= '<spellrequest textalreadyclipped="0" ignoredups="0" ignoredigits="1" ignoreallcaps="0">';
-		$body .= '<text>'.$text.'</text></spellrequest>';
-
-		if (!function_exists('curl_init'))
-		{
-			exit('Curl is not available');
-		}
+		$url = 'https://www.google.com/tbproxy/spell?lang=' . $this->_config['lang'];
+		/** @noinspection SpellCheckingInspection */
+		$body = '<?xml version="1.0" encoding="' . $this->_config['encoding']
+			. '"?><spellrequest textalreadyclipped="0" ignoredups="0" ignoredigits="1" ignoreallcaps="0"><text>'
+			. htmlspecialchars($text, ENT_NOQUOTES, $this->_config['encoding']) . '</text></spellrequest>';
 
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL,$url);
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0');
 		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		$xml_response = curl_exec($ch);
-		curl_close($ch);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
 
-		$xml = simplexml_load_string($xml_response);
+		$xml_response = curl_exec($ch);
+		if ($xml_response === false)
+			$error = 'cURL error: ' . curl_error($ch);
+
+		curl_close($ch);
+		if (isset($error))
+			throw new \RuntimeException($error);
+
+		$xml = @simplexml_load_string($xml_response);
+		if (!isset($xml->c))
+			throw new \LogicException($xml_response);
 
 		$matches = array();
+		foreach ($xml->c as $word) {
 
-		foreach($xml->c as $word)
-		{
+			$attributes = $word->attributes();
 			$matches[] = array(
-				(int) $word->attributes()->o,
-				(int) $word->attributes()->l,
-				(int) $word->attributes()->s,
-				(string) $word
+				intval($attributes->o),
+				intval($attributes->l),
+				intval($attributes->s),
+				(string)$word
 			);
 		}
 

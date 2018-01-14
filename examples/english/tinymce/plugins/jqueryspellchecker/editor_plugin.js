@@ -66,7 +66,7 @@
         lang: 'en',
         parser: 'html',
         webservice: {
-          path: "/webservices/php/SpellChecker.php",
+          path: "/src/webservices/php/SpellChecker.php",
           driver: 'pspell'
         },
         suggestBox: {
