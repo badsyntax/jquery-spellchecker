@@ -1,4 +1,4 @@
-/*
+/*!
  * jQuery Spellchecker - v0.2.4
  * https://github.com/badsyntax/jquery-spellchecker
  *
@@ -9,8 +9,8 @@
   position: absolute;
   display: none;
   z-index: 9999;
-  overflow: none;
-  font: normal 13px arial;
+  overflow: hidden;
+  font: normal 13px Arial,Helvetica,sans-serif;
   box-shadow: 0 0 4px #aaa;
   background: #fff;
   border: 1px solid #bbb;
