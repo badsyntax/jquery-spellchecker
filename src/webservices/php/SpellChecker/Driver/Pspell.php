@@ -35,9 +35,9 @@ class PSpell extends \SpellChecker\Driver
 			pspell_config_data_dir($conf, $dir);
 			pspell_config_dict_dir($conf, $dir);
 
-			$this->pspell_link = pspell_new_config($conf);
+			$this->pspell_link = @pspell_new_config($conf);
 		} else {
-			$this->pspell_link = pspell_new($this->_config['lang'], null, null, $this->_config['encoding']);
+			$this->pspell_link = @pspell_new($this->_config['lang'], null, null, $this->_config['encoding']);
 		}
 
 		if ($this->pspell_link === false) {

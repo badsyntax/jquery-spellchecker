@@ -71,7 +71,6 @@ class Google extends \SpellChecker\Driver
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_HEADER, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0');
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -89,7 +88,7 @@ class Google extends \SpellChecker\Driver
 
 		$xml = @simplexml_load_string($xml_response);
 		if (!isset($xml->c))
-			throw new \LogicException($xml_response);
+			throw new \LogicException(empty($xml) ? static::strip_html($xml_response) : $xml);
 
 		$matches = array();
 		foreach ($xml->c as $word) {
@@ -104,5 +103,13 @@ class Google extends \SpellChecker\Driver
 		}
 
 		return $matches;
+	}
+
+	private static function strip_html($html)
+	{
+		foreach (array('head', 'title', 'style', 'script') as $tag) {
+			$html = preg_replace('#\s*<' . $tag . '(\s[^>]*)?>.*?</' . $tag . '>#sui', '', $html);
+		}
+		return trim(strip_tags($html));
 	}
 }
