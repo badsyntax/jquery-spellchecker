@@ -1,35 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8"/>
   <title>jQuery Spell Checker example - Text parser using Enchant</title>
-  <meta name="description" content="">
-  <link rel="stylesheet" type="text/css" media="screen" href="../../css/jquery.spellchecker.css" />
+
+  <link rel="stylesheet" type="text/css" media="screen" href="../../dist/css/jquery.spellchecker.min.css"/>
 </head>
 <body>
-    <p>This example demonstrates how the <em>text parser</em> can be used to check the spelling of text in a form field.</p>
-    <div>
-      <textarea id="text-content" rows="5" cols="25">Add your own text and check the spellling</textarea>
-      <div id="incorrect-word-list"></div>
-    </div>
-    <button id="check-textarea">
-      Check Spelling
-    </button>&nbsp;
-  </div>
-  <script type="text/javascript" src="../../js/libs/jquery/jquery-1.8.2.min.js"></script>
-  <script type="text/javascript" src="../../js/jquery.spellchecker.js"></script>
-  <script type="text/javascript">
+  <p>This example demonstrates how the <em>text parser</em> can be used to check the spelling of text in a form field.</p>
 
+  <div>
+    <textarea id="text-content" rows="5" cols="25" placeholder="">Add your own text and check the spellling</textarea>
+
+    <div id="incorrect-word-list"></div>
+  </div>
+  <button id="check-textarea">Check Spelling</button>&nbsp;
+
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script type="text/javascript" src="../../dist/js/jquery.spellchecker.min.js"></script>
+
+  <script type="text/javascript">
     (function() {
 
       var element = $('#text-content');
-      
+
       // Init the text spellchecker
       var spellchecker = new $.SpellChecker(element, {
         lang: 'en',
         parser: 'text',
         webservice: {
-          path: '../../webservices/php/SpellChecker.php',
+          path: '../../src/webservices/php/SpellChecker.php',
           driver: 'enchant'
         },
         suggestBox: {
@@ -46,7 +46,7 @@
       });
 
       // Check the spelling
-      $("#check-textarea").click(function(e){
+      $("#check-textarea").click(function() {
         spellchecker.check();
       });
     })();
