@@ -9,13 +9,13 @@ describe("SpellChecker", function() {
       lang: 'en',
       parser: parser,
       webservice: {
-        path: 'http://jquery-spellchecker/src/webservices/php/SpellChecker.php',
-        driver: 'pspell'
+        path: 'http://localhost:8000/src/webservices/php/SpellChecker.php',
+        driver: 'PSpell'
       }
     });
   };
 
-  describe('Dependancies', function() {
+  describe('Dependencies', function() {
     it('Has jQuery', function() {
       expect(window.jQuery).not.toBe('undefined');
     });
@@ -29,7 +29,7 @@ describe("SpellChecker", function() {
 
   describe('Plugin destroy', function() {
 
-    it('Destroys the suggestBox and incorrectWords box elements', function(){
+    it('Destroys the suggestBox and incorrectWords box elements', function() {
       var a = $('<a id="test1" />').appendTo('body');
       var spellchecker = new $.SpellChecker(a);
       spellchecker.destroy();
@@ -54,7 +54,7 @@ describe("SpellChecker", function() {
       a.remove();
     });
 
-    it('Sets an element propery as a jQuery instance', function() {
+    it('Sets an element property as a jQuery instance', function() {
       expect(spellchecker.elements.jquery).not.toBe(undefined);
       expect(spellchecker.elements.length).toBe(1);
       expect(spellchecker.elements[0]).toBe(a[0]);
@@ -111,7 +111,7 @@ describe("SpellChecker", function() {
       a.remove();
     });
 
-    it('Extends the events util', function(){
+    it('Extends the events util', function() {
       expect(typeof spellchecker.on).toBe('function');
     });
 
@@ -120,7 +120,7 @@ describe("SpellChecker", function() {
     });
 
     it('Assigns a new jQuery callbacks list object to the list of handlers', function() {
-      spellchecker.on('test', function(){});
+      spellchecker.on('test', function() {});
       expect(typeof spellchecker._handlers.test).toBe('object');
       expect(typeof spellchecker._handlers.test.add).toBe('function');
     });
@@ -155,7 +155,7 @@ describe("SpellChecker", function() {
   });
 
   describe('Suggest box', function() {
-    
+
     var spellchecker, a, parser;
 
     beforeEach(function () {
@@ -180,7 +180,7 @@ describe("SpellChecker", function() {
         'word1',
         'word2',
         'word3'
-      ]; 
+      ];
       spellchecker.suggestBox.addWords(words);
       var children = spellchecker.suggestBox.container.find('.words').children();
       expect(children.length).toBe(3);
@@ -272,7 +272,7 @@ describe("SpellChecker", function() {
         'Olá este é um teste Como você está hoje'
       };
 
-      for(var key in tests) {
+      for (var key in tests) {
         expect(parser.clean(key)).toBe(tests[key]);
       }
     });
@@ -288,7 +288,7 @@ describe("SpellChecker", function() {
       var replaced = parser.replaceWordInText('порядке', 'хорошо', text);
       expect(replaced).toBe('Привет, ты в хорошо? Хотели бы Вы немного кокса? Нет, спасибо, я в хорошо!');
     });
-  });  
+  });
 
   describe('Public methods', function() {
 
@@ -298,7 +298,7 @@ describe("SpellChecker", function() {
       spellchecker.destroy();
       expect(text).toBe('test there');
     });
-    
+
     it('Replaces a word in a DOM tree', function() {
       a = $('<a id="test1">he<span>llo</span></a>').appendTo('body');
       var spellchecker = newSpellChecker('html', a);

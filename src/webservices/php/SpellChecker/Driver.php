@@ -1,4 +1,5 @@
-<?php
+<?php namespace SpellChecker;
+
 /**
  * Spellchecker driver class
  *
@@ -7,9 +8,6 @@
  * @copyright  (c) Richard Willis
  * @license    https://github.com/badsyntax/jquery-spellchecker/blob/master/LICENSE-MIT
  */
-
-namespace SpellChecker;
-
 abstract class Driver {
 
 	protected $_config = array();
@@ -18,49 +16,67 @@ abstract class Driver {
 
 	public function __construct($config = array())
 	{
-		$this->_config = array_merge($this->_default_config, $config);
+		$this->_config = array_merge($this->_default_config, array_filter($config));
 	}
 
-	public function send_data($outcome, $data) {
+	protected function send_data($data, $outcome = null)
+	{
+		return ($outcome === null) ? $data : compact('outcome', 'data');
+	}
 
-		$response = $data;
+	public function get_suggestions($inputs = array())
+	{
+		$word = isset($inputs['word']) ? $inputs['word'] : '';
+		$response = empty($word) ? array() : $this->get_word_suggestions($word = trim($word));
 
-		if ($outcome !== NULL)
-		{
-			$response = new \StdClass();
-			$response->outcome = $outcome;
-			$response->data = $data;
+		// remove original word from the results
+		if ($response) {
+			$response = array_diff($response, array($word));
 		}
 
-		header('Content-type: application/json');
-
-		echo json_encode($response);
+		return $this->send_data($response);
 	}
 
-	public function get_suggestions()
+	public function get_incorrect_words($inputs = array())
 	{
-		$word = Request::post('word');
+		$texts = isset($inputs['text']) ? (array)$inputs['text'] : array();
 
-		$this->send_data(NULL, $this->get_word_suggestions($word));
-	}
-
-	public function get_incorrect_words()
-	{
-		$texts = (array) Request::post('text');
-		$callback = array($this, '_get_incorred_words');
+		$callback = array($this, '_get_incorrect_words');
 		$response = array_map($callback, $texts);
 
-		$this->send_data('success', $response);
+		return $this->send_data($response, 'success');
 	}
 
-	public function _get_incorred_words($text)
+	protected function _get_incorrect_words($text)
 	{
-		$words = explode(' ', $text);
+		if (empty($text))
+			return array();
+
+		$words = array_unique(preg_split('/\s+/u', trim($text)));
 		$callback = array($this, 'check_word');
 		return array_values(array_filter($words, $callback));
 	}
 
-	abstract public function get_word_suggestions($word = NULL);
+	protected function check_word($word)
+	{
+		$result = $this->is_incorrect_word($word);
 
-	abstract public function check_word($word = NULL);
+		// word can contains hyphens
+		if ($result && count($words = preg_split('/[-_]+/', $word)) > 1) {
+			if ($this->is_incorrect_word(implode('', $words))) {
+				foreach ($words as $w) {
+					if ($this->is_incorrect_word($w))
+						return true;
+				}
+			}
+
+			return false;
+		}
+
+		return $result;
+	}
+
+	abstract protected function get_word_suggestions($word);
+
+	abstract protected function is_incorrect_word($word);
 }

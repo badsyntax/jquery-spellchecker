@@ -10,10 +10,7 @@
 
 ini_set('display_errors', 1);
 
-require_once 'SplClassLoader.php';
+require_once '../../../vendor/autoload.php';
 
-$classLoader = new SplClassLoader('SpellChecker', 'SpellChecker');
-$classLoader->setIncludePathLookup(true);
-$classLoader->register();
-
+header('Access-Control-Allow-Origin: *');
 new \SpellChecker\Request();

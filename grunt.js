@@ -2,37 +2,34 @@
 
 module.exports = function(grunt) {
 
+  // Project configuration
   grunt.initConfig({
-    pkg: '<json:jquery.spellchecker.json>',
+    pkg: '<json:package.json>',
     meta: {
       banner: '/*\n * <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
         '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-        '<%= pkg.homepage ? " * " + pkg.homepage + "\n" : "" %>' +
+        ' * <%= pkg.homepage %>\n' +
         ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-        ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */'
+        ' Licensed <%= pkg.license %>\n */'
     },
     concat: {
       dist: {
-        src: ['<banner:meta.banner>', '<file_strip_banner:src/js/<%= pkg.name %>.js>', '<banner:meta.test'],
-        dest: 'dist/js/<%= pkg.name %>.js'
+        src: ['<banner:meta.banner>', '<file_strip_banner:src/js/jquery.spellchecker.js>'],
+        dest: 'dist/js/jquery.spellchecker.js'
       }
     },
     copy: {
       dist: {
         files: {
-          "dist/examples/": "src/examples/**",
-          "dist/css/": "src/css/*",
-          "dist/webservices/php/": "src/webservices/php/**",
-          "dist/js/libs/jquery/": "src/js/libs/jquery/jquery-1.8.2.min.js"
+          "dist/css/": "src/css/*"
         }
       }
     },
     min: {
-      dist: 
-        {
-          src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
-          dest: 'dist/js/<%= pkg.name %>.min.js'
-        }
+      dist: {
+        src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
+        dest: 'dist/js/jquery.spellchecker.min.js'
+      }
     },
     mincss: {
       compress: {
@@ -41,22 +38,18 @@ module.exports = function(grunt) {
         }
       }
     },
-    compress: {
-      zip: {
-        files: {
-          "archive/jquery.spellchecker-<%= pkg.version %>.zip": "dist/**"
-        }
-      }
-    },
     jasmine : {
       src : [
-        'src/js/libs/jquery/jquery-1.8.2.min.js',
-        'src/js/jquery.spellchecker.js'
+        'node_modules/jquery/dist/jquery.min.js',
+        'src/js/**/*.js'
       ],
       specs : 'tests/javascript/spec/**/*.js'
     },
+    'jasmine-server': {
+      browser: false
+    },
     lint: {
-      files: ['grunt.js', 'src/js/jquery.spellchecker.js', 'tests/javascript/**/*.js']
+      files: ['grunt.js', 'src/js/**/*.js', 'tests/javascript/**/*.js']
     },
     jshint: {
       options: {
@@ -81,10 +74,11 @@ module.exports = function(grunt) {
     uglify: {}
   });
 
+  // Load the plugins
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-mincss');
-  grunt.loadNpmTasks('grunt-contrib-compress');
   grunt.loadNpmTasks('grunt-jasmine-runner');
 
-  grunt.registerTask('default', 'lint jasmine concat min mincss copy compress');
+  // Default task(s)
+  grunt.registerTask('default', 'lint concat min mincss copy');//lint jasmine
 };
