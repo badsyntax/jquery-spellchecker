@@ -1,5 +1,5 @@
-/*
- * jQuery Spellchecker - CKeditor Plugin - v0.2.4
+/*!
+ * jQuery Spellchecker - CKEditor Plugin - v0.2.4
  * https://github.com/badsyntax/jquery-spellchecker
  * Copyright (c) 2012 Richard Willis; Licensed MIT
  */
@@ -11,7 +11,7 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
     parser: 'html',
     webservice: {
       path: '/src/webservices/php/SpellChecker.php',
-      driver: 'pspell'
+      driver: 'PSpell'
     },
     suggestBox: {
       position: 'below',
@@ -25,7 +25,7 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
     var pluginName = 'jqueryspellchecker';
 
     this.config.suggestBox.position = this.positionSuggestBox();
-    
+
     editor.addCommand(pluginName, {
       canUndo: false,
       readOnly: 1,
@@ -54,9 +54,9 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
 
     this.createSpellchecker();
     this.spellchecker.check();
-    
+
     $(this.editorWindow)
-    .on('scroll.spellchecker', $.proxy(function scroll(){
+    .on('scroll.spellchecker', $.proxy(function scroll() {
       if (this.spellchecker.suggestBox) {
         this.spellchecker.suggestBox.close();
       }
@@ -64,7 +64,7 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
   },
 
   destroy: function() {
-    if (!this.spellchecker) 
+    if (!this.spellchecker)
       return;
     this.spellchecker.destroy();
     this.spellchecker = null;
@@ -120,9 +120,9 @@ CKEDITOR.plugins.add('jqueryspellchecker', {
 
       top -= $(t.editorWindow).scrollTop();
 
-      this.container.css({ 
-        top: top, 
-        left: left  
+      this.container.css({
+        top: top,
+        left: left
       });
     };
   }

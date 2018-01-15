@@ -1,4 +1,4 @@
-/*
+/*!
  * jQuery Spellchecker - TinyMCE Plugin - v0.2.4
  * https://github.com/badsyntax/jquery-spellchecker
  * Copyright (c) 2012 Richard Willis; Licensed MIT
@@ -18,7 +18,7 @@
       };
     },
 
-    init : function(ed, url) {
+    init : function(ed/*, url*/) {
       this.editor = ed;
       ed.addCommand('mcejQuerySpellCheck', $.proxy(this, '_onCheck'));
     },
@@ -67,7 +67,7 @@
         parser: 'html',
         webservice: {
           path: "/src/webservices/php/SpellChecker.php",
-          driver: 'pspell'
+          driver: 'PSpell'
         },
         suggestBox: {
           position: 'below',
@@ -118,9 +118,9 @@
         var left = p2.left + offset_left;
         var top = p2.top - vp.y + offset_top + word.offsetHeight;
 
-        this.container.css({ 
-          top: top, 
-          left: left 
+        this.container.css({
+          top: top,
+          left: left
         });
       };
     },
@@ -128,8 +128,8 @@
     createControl : function(n, cm) {
       if (n == 'jqueryspellchecker') {
         return cm.createButton(n, {
-          title : 'spellchecker.desc', 
-          cmd : 'mcejQuerySpellCheck', 
+          title : 'spellchecker.desc',
+          cmd : 'mcejQuerySpellCheck',
           scope : this
         });
       }
